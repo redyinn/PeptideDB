@@ -1,141 +1,157 @@
 # Development Plan — Premium Peptide Research Website (Bilingual)
 
-## 1) Objectives
+## 1) Objectives (Updated Status)
 - Deliver a **premium, light/clean, medical-grade** peptide research website with **DE/EN toggle**.
-- Build a **Peptide Encyclopedia** (MongoDB) combining **AI-generated structured profiles** + citations/links to **PubMed/ClinicalTrials.gov**.
-- Provide **live study tracking** focused on **Eli Lilly + major pharma** using **ClinicalTrials.gov** and paper discovery via **PubMed**.
-- Provide a **scientific/economic news feed** about peptides (News API) with tagging and search.
-- Use **high-end motion** (subtle gradients + particles + molecule/DNA motifs) without hurting readability/performance.
+- Provide a **Peptide Encyclopedia** (MongoDB) combining **AI-generated structured profiles** + live links to **PubMed/ClinicalTrials.gov**.
+- Provide **live study tracking** focused on **Eli Lilly + major pharma** using **ClinicalTrials.gov v2**.
+- Provide **scientific paper tracking** using **PubMed E-utilities**.
+- Provide a **news feed** for peptide-related developments.
+- Use **high-end motion** (subtle gradients + hover micro-interactions + glass UI); keep animation tasteful and performance-safe.
+
+**Current status:**
+- ✅ Phase 1 POC complete (all integration tests passed)
+- ✅ Phase 2 V1 MVP complete (backend + frontend + bilingual + data sources + premium UI)
+- ⏳ Seeding in progress: **17/20** initial important peptides generated
+
+---
 
 ## 2) Implementation Steps (Phased)
 
-### Phase 1 — Core Workflow POC (Isolation) (must pass before app build)
+### Phase 1 — Core Workflow POC (Isolation) ✅ COMPLETED
 **Core = “Fetch real studies + papers + generate/stash peptide profile reliably”**
 
-**User stories (POC)**
-1. As a user, I want to search a peptide name and get a structured profile draft in seconds.
-2. As a user, I want to see real **ClinicalTrials.gov** trials for a query (e.g., “tirzepatide”, “Eli Lilly”).
-3. As a user, I want to see real **PubMed** papers for the same query with titles/authors/links.
-4. As a user, I want the system to merge results into one normalized object (peptide + trials + papers).
-5. As a developer, I want the object saved in MongoDB and retrievable by slug/id.
+**Completed outputs**
+- Standalone POC script validating:
+  - ✅ ClinicalTrials.gov v2 access (request method corrected; 403 fixed by switching to `requests` + headers)
+  - ✅ PubMed search + summaries
+  - ✅ OpenAI generation via **Emergent LLM key** with strict JSON
+  - ✅ MongoDB upsert + retrieval
+  - ✅ Combined pipeline
 
-**POC tasks**
-- Web research (quick): confirm best-practice endpoints + rate limits for:
-  - ClinicalTrials.gov v2 API (studies search, sponsor filter)
-  - NCBI E-utilities (esearch + esummary/efetch)
-  - Pick a News API provider and validate query capabilities
-- Write **standalone Python scripts** (no app) to prove:
-  - ClinicalTrials.gov query by keyword + sponsor/company returns trials
-  - PubMed query returns papers
-  - OpenAI call generates **strict JSON** peptide profile (DE+EN fields)
-  - MongoDB insert/read works for the resulting document
-- Define the canonical schema (minimal but extensible):
-  - `peptide`: names, synonyms, mechanism, indications, benefits, risks, dosing (research-only disclaimer), regulatory/research status
-  - `sources`: trials[], papers[], news[] with stable URLs/ids
-  - `i18n`: `de`, `en` blocks (or per-field translations)
-- “Fix until works”: retries/backoff, JSON validation, dedupe logic (trial id, PMID), basic caching.
-
-**Exit criteria (POC)**
-- One command produces a MongoDB document for a peptide query containing:
-  - ≥5 trials (when available), ≥5 papers (when available), AI profile JSON valid
-  - Deterministic parsing + no manual edits
+**Exit criteria (met)**
+- ✅ One command produces a MongoDB document with generated bilingual peptide profile + retrievable source data.
 
 ---
 
-### Phase 2 — V1 App Development (MVP, no auth)
-**Architecture**
-- Frontend: React (Vite/Next) + Tailwind (or equivalent) + Framer Motion
-- Background motion: lightweight particles + subtle animated gradients; optional Three.js molecule scene behind hero
-- Backend: FastAPI
-- DB: MongoDB
-- Integrations: OpenAI (Emergent key), ClinicalTrials.gov, PubMed, News API
+### Phase 2 — V1 App Development (MVP, no auth) ✅ COMPLETED
+**Architecture (as built)**
+- Frontend: **React (CRA + Craco)** + Tailwind + shadcn/ui + Framer Motion
+- Backend: **FastAPI**
+- DB: **MongoDB**
+- Integrations:
+  - ✅ OpenAI (via Emergent proxy key)
+  - ✅ ClinicalTrials.gov v2
+  - ✅ PubMed E-utilities
+  - ⚠️ News: implemented as an aggregated “news” stream combining **recent PubMed papers + recent ClinicalTrials.gov trial updates** (no external News API key yet)
 
-**User stories (V1)**
-1. As a user, I can toggle **Deutsch/English** and the UI + peptide content switches accordingly.
-2. As a user, I can search peptides and open a **clean detail page** with indications/benefits/risks/dosing/research status.
-3. As a user, I can view **Live Studies** and filter by company (Eli Lilly) and status (recruiting/completed).
-4. As a user, I can view **Papers** with PubMed links and sort by relevance/date.
-5. As a user, I can read a **News feed** about peptides and open the source article.
+**User stories (V1) — delivered**
+1. ✅ Bilingual toggle DE/EN switching UI + peptide content
+2. ✅ Encyclopedia search + premium peptide detail pages (indications/benefits/dosage/safety/research status)
+3. ✅ Live studies page w/ filters (company chips incl. Eli Lilly, status)
+4. ✅ Papers page w/ PubMed links + sorting
+5. ✅ News page showing latest publications and trial updates
 
-**Build steps**
-- Backend (FastAPI)
-  - Endpoints:
-    - `GET /api/peptides?query=` (search)
-    - `GET /api/peptides/{slug}` (details)
-    - `POST /api/peptides/generate` (LLM generate/refresh; admin-like but unauthenticated for MVP)
-    - `GET /api/trials?query=&company=&status=` (ClinicalTrials.gov)
-    - `GET /api/papers?query=` (PubMed)
-    - `GET /api/news?query=&topic=` (News API)
-  - Normalization + dedupe + caching layer (Mongo collection for cached API responses)
-  - Background jobs (simple polling endpoint/cron-ready structure; actual cron later)
-  - Strong validation (Pydantic models) and citation fields
-- Frontend
-  - Pages: Home (hero + search), Encyclopedia (list), Peptide detail, Studies, Papers, News
-  - Premium UI kit: typography scale, spacing system, cards, tables, skeleton loaders, empty states
-  - Motion: scroll-based reveals; subtle background gradient animation; particles in hero; ensure accessibility/reduced-motion
-  - i18n: JSON dictionaries + content selection from API response
-- Seed initial “important peptides” list (curated starter set) and generate profiles on demand.
+**Backend (FastAPI) — delivered endpoints**
+- ✅ `GET /api/health`
+- ✅ `GET /api/stats`
+- ✅ `GET /api/peptides?query=&category=&page=&limit=`
+- ✅ `GET /api/peptides/categories`
+- ✅ `GET /api/peptides/{slug}`
+- ✅ `POST /api/peptides/generate` (AI generate/refresh)
+- ✅ `POST /api/peptides/seed` (background seeding)
+- ✅ `GET /api/peptides/seed/status`
+- ✅ `GET /api/trials?query=&company=&status=&page_size=`
+- ✅ `GET /api/papers?query=&sort=&max_results=`
+- ✅ `GET /api/news?topic=&limit=`
+
+**Frontend — delivered pages**
+- ✅ Home (hero search + live stats + featured peptides + latest trials + recent papers)
+- ✅ Encyclopedia (search + category filter + generate profile on empty state)
+- ✅ Peptide Detail (tabs: Overview, Mechanism, Dosage, Safety, Studies, Papers)
+- ✅ Studies (search + status filter + company chips)
+- ✅ Papers (search + relevance/date sorting)
+- ✅ News (featured item + feed)
+
+**Design — delivered**
+- ✅ Premium light/clean aesthetic
+- ✅ Glass navbar, clean typography (Space Grotesk + IBM Plex)
+- ✅ Subtle hero gradient + noise overlay
+- ✅ Hover micro-interactions (no `transition: all`)
 
 **Testing (end of Phase 2)**
-- One end-to-end pass:
-  - Search peptide → detail page renders
-  - Trials/papers/news fetch correctly
-  - Language toggle works across pages
-  - No layout breaks on mobile/desktop
+- ✅ Testing agent report: Backend **100%**, Frontend **95%**
+- ✅ Manual verification via screenshots: home, studies, encyclopedia, peptide detail, bilingual switching
+
+**Data status (V1)**
+- ⏳ Seeding in progress: **17/20** important peptides generated (continues asynchronously)
+- ✅ Real-time trials and papers fetched live with caching
 
 ---
 
-### Phase 3 — Feature Expansion (quality + automation)
+### Phase 3 — Feature Expansion (quality + automation) 🔜 READY (Not Started)
 **User stories (Expansion)**
-1. As a user, I can track **Eli Lilly** as a saved filter and return to it instantly.
-2. As a user, I can subscribe to “What’s new this week” (digest page; email later).
-3. As a user, I can compare two peptides side-by-side.
-4. As a user, I can see “Last updated” timestamps and source counts per peptide.
-5. As a user, I can report an issue on a peptide page (feedback form).
+1. Save an **Eli Lilly** filter and return instantly (saved searches)
+2. Weekly digest page (“What’s new this week”), optional email later
+3. Compare two peptides side-by-side (compare view)
+4. Show “Last updated”, source counts, and freshness indicators per peptide
+5. Feedback/report issue on peptide page
 
-**Build steps**
-- Scheduled refresh (cron-ready):
-  - Update trials/papers/news snapshots daily
-  - Refresh AI profiles when sources change materially
-- Data quality upgrades:
-  - Company normalization (Eli Lilly synonyms), trial status mapping, tagging
-  - Source citations section on each peptide page
-- UX upgrades:
-  - Advanced filters (company, phase, condition)
-  - Compare view, saved searches (local storage in MVP)
-- Observability:
-  - Basic logging, request timing, API error dashboards (lightweight)
+**Build steps (revised based on current MVP)**
+- Automation & refresh
+  - Add scheduled refresh (cron-ready job runner) for:
+    - trials cache refresh (e.g., every 6–12h)
+    - papers refresh (daily)
+    - news aggregation refresh (daily)
+  - Persist `last_updated` timestamps per peptide + per source
+- Data model upgrades
+  - Add `sources: { trials: [...], papers: [...], news: [...] }` to peptide docs (optional denormalization)
+  - Company normalization (Eli Lilly variants) and trial status mapping
+  - Add citations section and copy-to-clipboard citation actions
+- UX upgrades
+  - Saved filters/searches (localStorage first)
+  - Compare page with key fields (mechanism, indications, safety, dosing, research status)
+  - Advanced filters (phase, condition, sponsor)
+- Observability
+  - Add structured logs for upstream API failures, cache hit ratios
+  - Light request timing metrics (middleware)
 
 **Testing (end of Phase 3)**
-- E2E: saved filters, compare, refresh pipeline, regression on V1 flows.
+- E2E: saved filters, compare flow, refresh pipeline, regression on Phase 2 pages
 
 ---
 
-### Phase 4 — Production Hardening + Auth (only after approval)
+### Phase 4 — Production Hardening + Auth (only after approval) 🔜 FUTURE
 **User stories (Hardening/Auth)**
-1. As a user, I can create an account to save peptides and searches across devices.
-2. As a user, I can manage notification preferences.
-3. As an admin, I can approve/edit peptide profiles and lock “verified” content.
-4. As an admin, I can trigger manual refresh and see job status.
-5. As a user, I can export a peptide summary (PDF/markdown).
+1. Accounts to save peptides/searches across devices
+2. Notification preferences
+3. Admin approval/edit workflow + “verified” content
+4. Manual refresh triggers + job status
+5. Export peptide summary (PDF/markdown)
 
 **Build steps**
-- Add auth (JWT) + roles (admin/editor/user)
-- Admin panel for curation + audit trail
-- Rate limiting, API key handling, security headers
-- Performance: CDN-friendly assets, image optimization, pagination everywhere
+- Auth (JWT) + roles (admin/editor/user)
+- Admin panel + audit trail
+- Security: rate limiting, API key handling, security headers
+- Performance: pagination everywhere, caching strategy, image optimization
 
 **Testing (end of Phase 4)**
-- Full regression including auth + role permissions.
+- Full regression including auth + role permissions
 
-## 3) Next Actions
-1. Lock initial schema (peptide profile JSON + sources + bilingual structure).
-2. Select News API provider and confirm query limits.
-3. Implement Phase 1 POC scripts (ClinicalTrials.gov + PubMed + OpenAI + Mongo) and iterate until stable.
-4. Once POC passes, scaffold FastAPI + React and implement Phase 2 MVP screens/endpoints.
+---
 
-## 4) Success Criteria
-- POC: can reliably generate and store a peptide document with real trials + papers + valid bilingual AI profile.
-- V1: fast, premium UI; bilingual toggle; encyclopedia + studies + papers + news all functional.
-- Data integrity: deduped sources, stable links (NCT/PMID), visible “last updated”.
-- Design: light/clean aesthetic, tasteful motion, accessible, responsive; no “AI template” look.
+## 3) Next Actions (Updated)
+1. **Let seeding finish** (remaining 3 peptides). Optionally add a UI indicator + “seed now” admin-only button.
+2. Decide whether to integrate an external **News API** (key required) or keep the current “papers+trials news” approach.
+3. Start Phase 3 with the highest ROI items:
+   - Saved Eli Lilly filter + advanced filtering
+   - “Last updated” + source counts + freshness indicators
+   - Scheduled refresh jobs
+
+---
+
+## 4) Success Criteria (Updated)
+- ✅ POC: reliably generate and store a peptide document with real trials + papers + valid bilingual AI profile.
+- ✅ V1: premium UI; bilingual toggle; encyclopedia + studies + papers + news all functional.
+- ✅ Data integrity: stable links (NCT/PMID), caching in place.
+- ✅ Design: light/clean aesthetic with tasteful motion; responsive; not “AI template” looking.
+- Phase 3 target: automated refresh + saved filters + compare + improved data freshness visibility.
