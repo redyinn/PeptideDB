@@ -1,53 +1,50 @@
-import { useEffect } from "react";
-import "@/App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
+import React, { Suspense } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import './i18n/i18n';
+import './App.css';
+import Navbar from './components/Layout/Navbar';
+import Footer from './components/Layout/Footer';
+import { Toaster } from './components/ui/sonner';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+const HomePage = React.lazy(() => import('./pages/HomePage'));
+const EncyclopediaPage = React.lazy(() => import('./pages/EncyclopediaPage'));
+const PeptideDetailPage = React.lazy(() => import('./pages/PeptideDetailPage'));
+const StudiesPage = React.lazy(() => import('./pages/StudiesPage'));
+const PapersPage = React.lazy(() => import('./pages/PapersPage'));
+const NewsPage = React.lazy(() => import('./pages/NewsPage'));
 
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
-
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
-
+function LoadingFallback() {
   return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-10 h-10 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+        <p className="text-sm text-muted-foreground">Loading...</p>
+      </div>
     </div>
   );
-};
+}
 
 function App() {
   return (
-    <div className="App">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </div>
+    <Router>
+      <div className="min-h-screen bg-background flex flex-col">
+        <Navbar />
+        <main className="flex-1">
+          <Suspense fallback={<LoadingFallback />}>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/encyclopedia" element={<EncyclopediaPage />} />
+              <Route path="/encyclopedia/:slug" element={<PeptideDetailPage />} />
+              <Route path="/studies" element={<StudiesPage />} />
+              <Route path="/papers" element={<PapersPage />} />
+              <Route path="/news" element={<NewsPage />} />
+            </Routes>
+          </Suspense>
+        </main>
+        <Footer />
+        <Toaster />
+      </div>
+    </Router>
   );
 }
 
