@@ -1,0 +1,42 @@
+[
+  {
+    "content": "Phase 1: Get OpenAI integration playbook (Emergent LLM key)",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 1: Research ClinicalTrials.gov API + PubMed API",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 1: Write POC test script (OpenAI + ClinicalTrials + PubMed + MongoDB)",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 1: Run & fix POC until all tests pass",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 2: Get design guidelines from design agent",
+    "status": "in_progress"
+  },
+  {
+    "content": "Phase 2: Backend implementation (all endpoints)",
+    "status": "pending"
+  },
+  {
+    "content": "Phase 2: Frontend implementation (all pages + animations)",
+    "status": "pending"
+  },
+  {
+    "content": "Phase 2: Seed initial peptide data",
+    "status": "pending"
+  },
+  {
+    "content": "Phase 2: All user stories covered in Development and testing",
+    "status": "pending"
+  },
+  {
+    "content": "Phase 2: End to End Testing using Testing Agent",
+    "status": "pending"
+  }
+]
