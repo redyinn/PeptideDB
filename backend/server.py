@@ -299,10 +299,29 @@ Return ONLY this exact JSON structure:
     "storage_conditions": {{
         "en": "Storage conditions",
         "de": "Lagerbedingungen"
-    }}
+    }},
+    "amino_acid_sequence": "Full amino acid sequence in one-letter code (e.g. HAEGTFTSDVSSYLEG...) or 'Synthetic small molecule' if not a peptide chain",
+    "reconstitution_info": {{
+        "preparation_en": "Reconstitution instructions in English",
+        "preparation_de": "Rekonstitutionsanleitung auf Deutsch",
+        "storage_temperature": "2-8°C",
+        "shelf_life_unopened": "e.g. 24 months",
+        "shelf_life_reconstituted": "e.g. 28 days refrigerated",
+        "light_sensitive": true,
+        "solvent": "e.g. Bacteriostatic water, 0.9% NaCl"
+    }},
+    "application_goals": [
+        {{
+            "goal_en": "e.g. Fat Loss, Muscle Building, Healing, Anti-Aging, Cognitive Enhancement, Immune Support",
+            "goal_de": "e.g. Fettverbrennung, Muskelaufbau, Heilung, Anti-Aging, Kognitive Verbesserung, Immununterstützung",
+            "relevance": "primary|secondary"
+        }}
+    ]
 }}
 
 Include at least 3 indications, 4 benefits, 5 side effects, and 3 contraindications.
+Include at least 2 application_goals with relevance levels.
+Provide a real amino acid sequence if known, or a representative sequence for synthetic peptides.
 Make all information scientifically accurate and detailed."""
 
     try:
@@ -371,6 +390,7 @@ async def health_check():
 async def get_peptides(
     query: str = "",
     category: str = "",
+    goal: str = "",
     page: int = 1,
     limit: int = 20
 ):
@@ -384,6 +404,8 @@ async def get_peptides(
         ]
     if category:
         filter_q["category"] = {"$regex": category, "$options": "i"}
+    if goal:
+        filter_q["application_goals.goal_en"] = {"$regex": goal, "$options": "i"}
     
     skip = (page - 1) * limit
     total = peptides_col.count_documents(filter_q)
@@ -395,6 +417,26 @@ async def get_peptides(
         "page": page,
         "pages": max(1, (total + limit - 1) // limit)
     }
+
+@app.get("/api/peptides/compare")
+async def compare_peptides(slugs: str = ""):
+    """Compare two peptides side by side"""
+    slug_list = [s.strip() for s in slugs.split(",") if s.strip()]
+    if len(slug_list) < 2:
+        raise HTTPException(status_code=400, detail="Provide at least 2 slugs separated by commas")
+    if len(slug_list) > 3:
+        slug_list = slug_list[:3]
+
+    results = []
+    for slug in slug_list:
+        doc = peptides_col.find_one({"slug": slug})
+        if doc:
+            results.append(serialize_doc(doc))
+
+    if len(results) < 2:
+        raise HTTPException(status_code=404, detail="Could not find enough peptides to compare")
+
+    return {"peptides": results, "count": len(results)}
 
 @app.get("/api/peptides/categories")
 async def get_peptide_categories():

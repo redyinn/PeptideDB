@@ -12,6 +12,8 @@ const PeptideDetailPage = React.lazy(() => import('./pages/PeptideDetailPage'));
 const StudiesPage = React.lazy(() => import('./pages/StudiesPage'));
 const PapersPage = React.lazy(() => import('./pages/PapersPage'));
 const NewsPage = React.lazy(() => import('./pages/NewsPage'));
+const ComparePage = React.lazy(() => import('./pages/ComparePage'));
+const GlossaryPage = React.lazy(() => import('./pages/GlossaryPage'));
 
 function LoadingFallback() {
   return (
@@ -34,10 +36,12 @@ function App() {
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/encyclopedia" element={<EncyclopediaPage />} />
+              <Route path="/encyclopedia/compare" element={<ComparePage />} />
               <Route path="/encyclopedia/:slug" element={<PeptideDetailPage />} />
               <Route path="/studies" element={<StudiesPage />} />
               <Route path="/papers" element={<PapersPage />} />
               <Route path="/news" element={<NewsPage />} />
+              <Route path="/glossary" element={<GlossaryPage />} />
             </Routes>
           </Suspense>
         </main>

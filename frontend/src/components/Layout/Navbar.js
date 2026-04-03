@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Search, Globe, FlaskConical } from 'lucide-react';
+import { Menu, X, Search, Globe, FlaskConical, Moon, Sun } from 'lucide-react';
 import { Button } from '../ui/button';
 
 const navItems = [
@@ -10,12 +10,33 @@ const navItems = [
   { key: 'studies', path: '/studies' },
   { key: 'papers', path: '/papers' },
   { key: 'news', path: '/news' },
+  { key: 'glossary', path: '/glossary' },
 ];
 
 export default function Navbar() {
   const { t, i18n } = useTranslation();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [dark, setDark] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('peptide-theme');
+      if (saved) return saved === 'dark';
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return false;
+  });
+
+  React.useEffect(() => {
+    const root = document.documentElement;
+    if (dark) {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    localStorage.setItem('peptide-theme', dark ? 'dark' : 'light');
+  }, [dark]);
+
+  const toggleTheme = () => setDark(prev => !prev);
 
   const toggleLang = () => {
     const newLang = i18n.language === 'en' ? 'de' : 'en';
@@ -62,6 +83,16 @@ export default function Navbar() {
 
             {/* Right side */}
             <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleTheme}
+                data-testid="theme-toggle"
+                className="w-9 h-9"
+                title={dark ? t('nav.light_mode') : t('nav.dark_mode')}
+              >
+                {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              </Button>
               <Button
                 variant="ghost"
                 size="sm"

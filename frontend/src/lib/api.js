@@ -18,6 +18,7 @@ export const generatePeptide = (name, forceRefresh = false) =>
 export const seedPeptides = () => api.post('/api/peptides/seed');
 export const getSeedStatus = () => api.get('/api/peptides/seed/status');
 export const getCategories = () => api.get('/api/peptides/categories');
+export const comparePeptides = (slugs) => api.get('/api/peptides/compare', { params: { slugs } });
 
 // Trials
 export const getTrials = (params = {}) => api.get('/api/trials', { params });

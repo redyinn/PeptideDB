@@ -6,7 +6,10 @@
     "papers": "Publikationen",
     "news": "Neuigkeiten",
     "search_placeholder": "Peptide, Studien, Publikationen suchen...",
-    "language": "Sprache"
+    "language": "Sprache",
+    "dark_mode": "Dunkelmodus",
+    "light_mode": "Hellmodus",
+    "glossary": "Glossar"
   },
   "home": {
     "hero_title": "Peptid-Forschungsintelligenz",
@@ -65,7 +68,21 @@
     "ema_approved": "EMA-zugelassen",
     "back_to_encyclopedia": "Zurück zur Enzyklopädie",
     "not_found": "Peptid nicht gefunden",
-    "amino_acid_count": "Aminosäuren"
+    "amino_acid_count": "Aminosäuren",
+    "amino_acid_sequence": "Aminosäure-Sequenz",
+    "reconstitution": "Rekonstitution",
+    "preparation": "Zubereitung",
+    "solvent": "Lösungsmittel",
+    "storage_temperature": "Lagertemperatur",
+    "shelf_life_unopened": "Haltbarkeit (ungeöffnet)",
+    "shelf_life_reconstituted": "Haltbarkeit (rekonstituiert)",
+    "light_sensitive": "Lichtempfindlich",
+    "compare": "Vergleichen",
+    "add_to_compare": "Zum Vergleich hinzufügen",
+    "remove_from_compare": "Entfernen",
+    "compare_peptides": "Peptide vergleichen",
+    "select_peptides": "Peptide zum Vergleich auswählen",
+    "property": "Eigenschaft"
   },
   "studies": {
     "title": "Klinische Studien",
@@ -111,6 +128,12 @@
     "paper": "Publikation",
     "trial": "Klinische Studie",
     "source": "Quelle"
+  },
+  "glossary": {
+    "title": "Glossar",
+    "subtitle": "Wissenschaftliche Begriffe und Definitionen der Peptidforschung.",
+    "search_placeholder": "Begriffe suchen...",
+    "no_results": "Keine passenden Begriffe gefunden."
   },
   "common": {
     "loading": "Laden...",

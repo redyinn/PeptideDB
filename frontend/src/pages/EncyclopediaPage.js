@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Search, FlaskConical, Sparkles, Loader2 } from 'lucide-react';
+import { Search, FlaskConical, Sparkles, Loader2, Target, GitCompareArrows, Clock } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -16,6 +16,24 @@ const fadeUp = {
   visible: (i = 0) => ({ opacity: 1, y: 0, transition: { delay: i * 0.06, duration: 0.45 } })
 };
 
+function getFreshness(dateStr) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return null;
+  const days = Math.floor((Date.now() - d.getTime()) / 86400000);
+  if (days < 7) return { color: 'bg-green-500', label: 'Fresh' };
+  if (days < 30) return { color: 'bg-yellow-500', label: 'Recent' };
+  if (days < 90) return { color: 'bg-orange-400', label: 'Aging' };
+  return { color: 'bg-muted-foreground/50', label: 'Stale' };
+}
+
+function formatDate(dateStr, lang) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return '';
+  return d.toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
 export default function EncyclopediaPage() {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
@@ -24,22 +42,24 @@ export default function EncyclopediaPage() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const [compareList, setCompareList] = useState([]);
   const [query, setQuery] = useState(searchParams.get('q') || '');
   const [category, setCategory] = useState('');
+  const [goal, setGoal] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
   const loadPeptides = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await getPeptides({ query, category, page, limit: 20 });
+      const res = await getPeptides({ query, category, goal, page, limit: 20 });
       setPeptides(res.data.peptides || []);
       setTotalPages(res.data.pages || 1);
     } catch (e) {
       console.error(e);
     }
     setLoading(false);
-  }, [query, category, page]);
+  }, [query, category, goal, page]);
 
   const loadCategories = useCallback(async () => {
     try {
@@ -94,7 +114,7 @@ export default function EncyclopediaPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={t('encyclopedia.search_placeholder')}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
             />
           </div>
           <Button type="submit" size="sm" className="btn-press rounded-xl">
@@ -115,6 +135,32 @@ export default function EncyclopediaPage() {
         </Select>
       </motion.div>
 
+      {/* Goal Filters */}
+      <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={2} className="flex flex-wrap items-center gap-2 mb-6">
+        <Target className="w-4 h-4 text-muted-foreground mr-1" />
+        {[
+          { key: '', labelEn: lang === 'de' ? 'Alle Ziele' : 'All Goals' },
+          { key: 'Fat Loss', labelEn: lang === 'de' ? 'Fettverbrennung' : 'Fat Loss' },
+          { key: 'Muscle Building', labelEn: lang === 'de' ? 'Muskelaufbau' : 'Muscle Building' },
+          { key: 'Healing', labelEn: lang === 'de' ? 'Heilung' : 'Healing' },
+          { key: 'Anti-Aging', labelEn: 'Anti-Aging' },
+          { key: 'Cognitive', labelEn: lang === 'de' ? 'Kognitiv' : 'Cognitive' },
+          { key: 'Immune', labelEn: lang === 'de' ? 'Immunsystem' : 'Immune Support' },
+        ].map((g) => (
+          <button
+            key={g.key}
+            onClick={() => { setGoal(g.key); setPage(1); }}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              goal === g.key
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80'
+            }`}
+          >
+            {g.labelEn}
+          </button>
+        ))}
+      </motion.div>
+
       {/* Results */}
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -133,9 +179,9 @@ export default function EncyclopediaPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {peptides.map((p, i) => (
               <motion.div key={p.slug || i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={i % 6}>
-                <Link to={`/encyclopedia/${p.slug}`}>
-                  <Card className="card-hover border border-border/50 h-full" data-testid={`peptide-card-${p.slug}`}>
-                    <CardContent className="p-5">
+                <Card className="card-hover border border-border/50 h-full relative" data-testid={`peptide-card-${p.slug}`}>
+                  <Link to={`/encyclopedia/${p.slug}`}>
+                    <CardContent className="p-5 pb-12">
                       <div className="flex items-start justify-between mb-2">
                         <h3 className="font-semibold text-base" style={{ fontFamily: 'Space Grotesk' }}>{p.name}</h3>
                         <Badge variant="secondary" className="text-xs shrink-0 ml-2">{p.category || 'Peptide'}</Badge>
@@ -153,9 +199,37 @@ export default function EncyclopediaPage() {
                           )}
                         </div>
                       )}
+                      {p.updated_at && (() => {
+                        const freshness = getFreshness(p.updated_at);
+                        return (
+                          <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
+                            {freshness && <span className={`w-1.5 h-1.5 rounded-full ${freshness.color} shrink-0`} />}
+                            <Clock className="w-3 h-3" />
+                            <span>{t('encyclopedia.last_updated')} {formatDate(p.updated_at, lang)}</span>
+                          </div>
+                        );
+                      })()}
                     </CardContent>
-                  </Card>
-                </Link>
+                  </Link>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setCompareList(prev =>
+                        prev.includes(p.slug)
+                          ? prev.filter(s => s !== p.slug)
+                          : prev.length < 3 ? [...prev, p.slug] : prev
+                      );
+                    }}
+                    className={`absolute bottom-3 right-3 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors flex items-center gap-1 ${
+                      compareList.includes(p.slug)
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
+                    }`}
+                  >
+                    <GitCompareArrows className="w-3 h-3" />
+                    {compareList.includes(p.slug) ? t('detail.remove_from_compare') : t('detail.compare')}
+                  </button>
+                </Card>
               </motion.div>
             ))}
           </div>
@@ -201,6 +275,23 @@ export default function EncyclopediaPage() {
             )}
           </CardContent>
         </Card>
+      )}
+
+      {/* Floating Compare Bar */}
+      {compareList.length >= 2 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40"
+        >
+          <Link
+            to={`/encyclopedia/compare?peptides=${compareList.join(',')}`}
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-primary text-primary-foreground shadow-lg hover:opacity-90 transition-opacity font-medium text-sm"
+          >
+            <GitCompareArrows className="w-4 h-4" />
+            {t('detail.compare_peptides')} ({compareList.length})
+          </Link>
+        </motion.div>
       )}
     </div>
   );

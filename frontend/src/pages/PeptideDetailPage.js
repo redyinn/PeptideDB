@@ -2,13 +2,21 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ExternalLink, Shield, Pill, Activity, AlertTriangle, Beaker, FlaskConical } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Shield, Pill, Activity, AlertTriangle, Beaker, FlaskConical, Copy, Check, Thermometer, Droplets, Clock } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Skeleton } from '../components/ui/skeleton';
 import { getPeptideDetail, getTrials, getPapers } from '../lib/api';
+import { toast } from 'sonner';
+
+function copyCitation(paper, lang) {
+  const authors = paper.authors?.slice(0, 3).join(', ') + (paper.authors?.length > 3 ? ' et al.' : '');
+  const citation = `${authors} "${paper.title}" ${paper.journal}${paper.volume ? ` ${paper.volume}` : ''}${paper.issue ? `(${paper.issue})` : ''}${paper.pages ? `:${paper.pages}` : ''} (${paper.pub_date}). PMID: ${paper.pmid}`;
+  navigator.clipboard.writeText(citation);
+  toast.success(lang === 'de' ? 'Zitat kopiert' : 'Citation copied');
+}
 
 const fadeUp = {
   hidden: { opacity: 0, y: 8 },
@@ -22,6 +30,41 @@ function InfoRow({ label, value, mono = false }) {
       <span className="text-sm text-muted-foreground w-40 shrink-0">{label}</span>
       <span className={`text-sm font-medium ${mono ? 'font-mono text-xs' : ''}`}>{value}</span>
     </div>
+  );
+}
+
+function AminoAcidSequenceCard({ sequence, t, lang }) {
+  const [copied, setCopied] = React.useState(false);
+  const handleCopy = () => {
+    navigator.clipboard.writeText(sequence);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <Card className="border border-border/50">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Droplets className="w-5 h-5 text-primary" />
+            {t('detail.amino_acid_sequence')}
+          </CardTitle>
+          <Button variant="ghost" size="sm" onClick={handleCopy} className="gap-1.5 text-xs">
+            {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+            {copied ? (lang === 'de' ? 'Kopiert' : 'Copied') : (lang === 'de' ? 'Kopieren' : 'Copy')}
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="p-3 rounded-lg bg-secondary/30 overflow-x-auto">
+          <p className="font-mono text-xs leading-6 break-all select-all whitespace-pre-wrap">
+            {sequence}
+          </p>
+        </div>
+        <p className="mt-2 text-xs text-muted-foreground">
+          {sequence.length} {t('detail.amino_acid_count')}
+        </p>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -120,6 +163,13 @@ export default function PeptideDetailPage() {
         <p className="text-base text-muted-foreground max-w-[72ch] leading-7">
           {p.description?.[lang] || p.description?.en || ''}
         </p>
+        {p.updated_at && (
+          <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Clock className="w-3.5 h-3.5" />
+            <span>{t('encyclopedia.last_updated')} {new Date(p.updated_at).toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+            {p.generated_by && <span className="text-muted-foreground/60">({p.generated_by})</span>}
+          </div>
+        )}
       </motion.div>
 
       {/* Tabs */}
@@ -178,6 +228,11 @@ export default function PeptideDetailPage() {
                   </ul>
                 </CardContent>
               </Card>
+
+              {/* Amino Acid Sequence */}
+              {p.amino_acid_sequence && (
+                <AminoAcidSequenceCard sequence={p.amino_acid_sequence} t={t} lang={lang} />
+              )}
             </div>
 
             {/* Sidebar */}
@@ -258,6 +313,32 @@ export default function PeptideDetailPage() {
               )}
             </CardContent>
           </Card>
+
+          {/* Reconstitution Info */}
+          {p.reconstitution_info && (
+            <Card className="border border-border/50 mt-6">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Thermometer className="w-5 h-5 text-primary" />
+                  {t('detail.reconstitution')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-0">
+                <InfoRow
+                  label={t('detail.preparation')}
+                  value={lang === 'de' ? p.reconstitution_info.preparation_de : p.reconstitution_info.preparation_en}
+                />
+                <InfoRow label={t('detail.solvent')} value={p.reconstitution_info.solvent} />
+                <InfoRow label={t('detail.storage_temperature')} value={p.reconstitution_info.storage_temperature} mono />
+                <InfoRow label={t('detail.shelf_life_unopened')} value={p.reconstitution_info.shelf_life_unopened} />
+                <InfoRow label={t('detail.shelf_life_reconstituted')} value={p.reconstitution_info.shelf_life_reconstituted} />
+                <InfoRow
+                  label={t('detail.light_sensitive')}
+                  value={p.reconstitution_info.light_sensitive ? t('common.yes') : t('common.no')}
+                />
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         {/* Safety Tab */}
@@ -318,29 +399,35 @@ export default function PeptideDetailPage() {
         <TabsContent value="studies">
           <div className="space-y-3">
             {trials.length > 0 ? trials.map((trial, i) => (
-              <a
-                key={trial.nct_id || i}
-                href={trial.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-start gap-4 p-4 rounded-xl border border-border/50 hover:border-primary/20 hover:bg-accent/30 transition-colors group"
-              >
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
-                    {trial.title}
-                  </p>
-                  <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                    <span className="font-mono">{trial.nct_id}</span>
-                    <span>|</span>
-                    <span>{trial.sponsor}</span>
+              <Card key={trial.nct_id || i} className="border border-border/50 hover:border-primary/20 transition-colors group">
+                <CardContent className="p-4">
+                  <a href={trial.url} target="_blank" rel="noopener noreferrer" className="block">
+                    <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors leading-relaxed">
+                      {trial.title}
+                    </p>
+                  </a>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
                     <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${getStatusClass(trial.status)}`}>
                       {trial.status?.replace(/_/g, ' ')}
                     </span>
                     {trial.phase !== 'N/A' && <Badge variant="outline" className="text-xs">{trial.phase}</Badge>}
+                    {trial.sponsor && <span className="text-xs text-muted-foreground">{trial.sponsor}</span>}
                   </div>
-                </div>
-                <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-primary shrink-0 mt-1" />
-              </a>
+                  {trial.conditions?.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {trial.conditions.slice(0, 4).map((c, ci) => (
+                        <Badge key={ci} variant="secondary" className="text-xs">{c}</Badge>
+                      ))}
+                    </div>
+                  )}
+                  <div className="mt-2">
+                    <a href={trial.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-primary hover:underline">
+                      <span className="font-mono">{trial.nct_id}</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+                </CardContent>
+              </Card>
             )) : (
               <p className="text-sm text-muted-foreground text-center py-8">{t('studies.no_results')}</p>
             )}
@@ -351,27 +438,42 @@ export default function PeptideDetailPage() {
         <TabsContent value="papers">
           <div className="space-y-3">
             {papers.length > 0 ? papers.map((paper, i) => (
-              <a
-                key={paper.pmid || i}
-                href={paper.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-start gap-4 p-4 rounded-xl border border-border/50 hover:border-primary/20 hover:bg-accent/30 transition-colors group"
-              >
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
-                    {paper.title}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
+              <Card key={paper.pmid || i} className="border border-border/50 hover:border-primary/20 transition-colors group">
+                <CardContent className="p-4">
+                  <a href={paper.url} target="_blank" rel="noopener noreferrer" className="block">
+                    <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors leading-relaxed">
+                      {paper.title}
+                    </p>
+                  </a>
+                  <p className="text-xs text-muted-foreground mt-1.5">
                     {paper.authors?.slice(0, 3).join(', ')}{paper.authors?.length > 3 ? ' et al.' : ''}
                   </p>
-                  <div className="mt-1.5 flex items-center gap-2">
-                    <Badge variant="outline" className="text-xs">{paper.journal}</Badge>
-                    <span className="text-xs text-muted-foreground">{paper.pub_date}</span>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    {paper.journal && <Badge variant="outline" className="text-xs">{paper.journal}</Badge>}
+                    {paper.pub_date && <span className="text-xs text-muted-foreground">{paper.pub_date}</span>}
+                    {paper.volume && <span className="text-xs text-muted-foreground">Vol. {paper.volume}{paper.issue ? `(${paper.issue})` : ''}</span>}
                   </div>
-                </div>
-                <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-primary shrink-0 mt-1" />
-              </a>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <a href={paper.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-primary hover:underline">
+                      <span className="font-mono">PMID: {paper.pmid}</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                    {paper.doi && (
+                      <a href={`https://doi.org/${paper.doi.replace('doi: ', '')}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-primary hover:underline">
+                        <span className="font-mono">DOI</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    )}
+                    <button
+                      onClick={() => copyCitation(paper, lang)}
+                      className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors ml-auto"
+                    >
+                      <Copy className="w-3 h-3" />
+                      {lang === 'de' ? 'Zitieren' : 'Cite'}
+                    </button>
+                  </div>
+                </CardContent>
+              </Card>
             )) : (
               <p className="text-sm text-muted-foreground text-center py-8">{t('papers.no_results')}</p>
             )}

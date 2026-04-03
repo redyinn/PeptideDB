@@ -6,7 +6,10 @@
     "papers": "Papers",
     "news": "News",
     "search_placeholder": "Search peptides, studies, papers...",
-    "language": "Language"
+    "language": "Language",
+    "dark_mode": "Dark Mode",
+    "light_mode": "Light Mode",
+    "glossary": "Glossary"
   },
   "home": {
     "hero_title": "Peptide Research Intelligence",
@@ -65,7 +68,21 @@
     "ema_approved": "EMA Approved",
     "back_to_encyclopedia": "Back to Encyclopedia",
     "not_found": "Peptide not found",
-    "amino_acid_count": "Amino Acids"
+    "amino_acid_count": "Amino Acids",
+    "amino_acid_sequence": "Amino Acid Sequence",
+    "reconstitution": "Reconstitution",
+    "preparation": "Preparation",
+    "solvent": "Solvent",
+    "storage_temperature": "Storage Temperature",
+    "shelf_life_unopened": "Shelf Life (Unopened)",
+    "shelf_life_reconstituted": "Shelf Life (Reconstituted)",
+    "light_sensitive": "Light Sensitive",
+    "compare": "Compare",
+    "add_to_compare": "Add to Compare",
+    "remove_from_compare": "Remove",
+    "compare_peptides": "Compare Peptides",
+    "select_peptides": "Select peptides to compare",
+    "property": "Property"
   },
   "studies": {
     "title": "Clinical Studies",
@@ -111,6 +128,12 @@
     "paper": "Publication",
     "trial": "Clinical Trial",
     "source": "Source"
+  },
+  "glossary": {
+    "title": "Glossary",
+    "subtitle": "Scientific terms and definitions used in peptide research.",
+    "search_placeholder": "Search terms...",
+    "no_results": "No matching terms found."
   },
   "common": {
     "loading": "Loading...",

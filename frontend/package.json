@@ -33,6 +33,7 @@
     "@radix-ui/react-tooltip": "^1.2.4",
     "@tsparticles/react": "^3.0.0",
     "@tsparticles/slim": "^3.9.1",
+    "ajv": "^8.18.0",
     "axios": "^1.8.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -65,6 +66,7 @@
     "build": "craco build",
     "test": "craco test"
   },
+  "proxy": "http://localhost:8001",
   "browserslist": {
     "production": [
       ">0.2%",

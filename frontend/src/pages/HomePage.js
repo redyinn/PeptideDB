@@ -255,7 +255,7 @@ export default function HomePage() {
       </section>
 
       {/* Latest Studies */}
-      <section className="bg-white border-y border-border">
+      <section className="border-y border-border/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="flex items-center justify-between mb-8">
             <motion.h2
@@ -284,7 +284,7 @@ export default function HomePage() {
                   href={trial.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start gap-4 p-4 rounded-xl border border-border/50 hover:border-primary/20 hover:bg-accent/30 transition-colors group"
+                  className="flex items-start gap-4 p-4 rounded-xl border border-border/20 hover:border-primary/30 hover:bg-accent/10 transition-colors group"
                   initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={i}
                   data-testid={`trial-item-${i}`}
                 >
@@ -346,8 +346,8 @@ export default function HomePage() {
                 rel="noopener noreferrer"
                 initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={i}
               >
-                <Card className="card-hover border border-border/50 h-full" data-testid={`paper-card-${i}`}>
-                  <CardContent className="p-5">
+                <div className="card-hover rounded-xl border border-border/20 h-full" data-testid={`paper-card-${i}`}>
+                  <div className="p-5">
                     <p className="text-sm font-medium text-foreground line-clamp-2 leading-relaxed mb-2">
                       {paper.title}
                     </p>
@@ -358,8 +358,8 @@ export default function HomePage() {
                       <Badge variant="outline" className="text-xs">{paper.journal}</Badge>
                       <span className="text-xs text-muted-foreground">{paper.pub_date}</span>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </motion.a>
             ))
           ) : null}
