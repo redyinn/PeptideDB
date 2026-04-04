@@ -54,6 +54,15 @@ except Exception as e:
     papers_cache_col = None
     news_cache_col = None
 
+# ─── IN-MEMORY FALLBACK ───────────────────────────────────────
+import json as _json, os as _os
+_FALLBACK_PEPTIDES = []
+_fallback_path = _os.path.join(_os.path.dirname(__file__), "peptides_export.json")
+if peptides_col is None and _os.path.exists(_fallback_path):
+    with open(_fallback_path, encoding="utf-8") as _f:
+        _FALLBACK_PEPTIDES = _json.load(_f)
+    logger.info(f"Using in-memory fallback: {len(_FALLBACK_PEPTIDES)} peptides loaded")
+
 # ─── HELPERS ─────────────────────────────────────────────────
 def require_db():
     if peptides_col is None:
@@ -412,7 +421,19 @@ async def get_peptides(
     limit: int = 20
 ):
     """Get all peptides with optional search/filter"""
-    require_db()
+    if peptides_col is None:
+        # In-memory fallback
+        results = _FALLBACK_PEPTIDES
+        if query:
+            q = query.lower()
+            results = [p for p in results if q in p.get("name","").lower() or q in p.get("category","").lower() or q in p.get("slug","").lower()]
+        if category:
+            c = category.lower()
+            results = [p for p in results if c in p.get("category","").lower()]
+        results = sorted(results, key=lambda x: x.get("name",""))
+        total = len(results)
+        skip = (page - 1) * limit
+        return {"peptides": results[skip:skip+limit], "total": total, "page": page, "pages": max(1, (total+limit-1)//limit)}
     filter_q = {}
     if query:
         filter_q["$or"] = [
@@ -424,17 +445,10 @@ async def get_peptides(
         filter_q["category"] = {"$regex": category, "$options": "i"}
     if goal:
         filter_q["application_goals.goal_en"] = {"$regex": goal, "$options": "i"}
-    
     skip = (page - 1) * limit
     total = peptides_col.count_documents(filter_q)
     docs = list(peptides_col.find(filter_q).sort("name", 1).skip(skip).limit(limit))
-    
-    return {
-        "peptides": [serialize_doc(d) for d in docs],
-        "total": total,
-        "page": page,
-        "pages": max(1, (total + limit - 1) // limit)
-    }
+    return {"peptides": [serialize_doc(d) for d in docs], "total": total, "page": page, "pages": max(1, (total + limit - 1) // limit)}
 
 @app.get("/api/peptides/compare")
 async def compare_peptides(slugs: str = ""):
@@ -459,16 +473,22 @@ async def compare_peptides(slugs: str = ""):
 @app.get("/api/peptides/categories")
 async def get_peptide_categories():
     """Get distinct peptide categories"""
-    categories = peptides_col.distinct("category")
+    if peptides_col is None:
+        categories = sorted(set(p.get("category","") for p in _FALLBACK_PEPTIDES if p.get("category")))
+    else:
+        categories = peptides_col.distinct("category")
     return {"categories": [c for c in categories if c]}
 
 @app.get("/api/peptides/{slug}")
 async def get_peptide_detail(slug: str):
     """Get detailed peptide information by slug"""
-    doc = peptides_col.find_one({"slug": slug})
+    if peptides_col is None:
+        doc = next((p for p in _FALLBACK_PEPTIDES if p.get("slug") == slug), None)
+    else:
+        doc = peptides_col.find_one({"slug": slug})
     if not doc:
         raise HTTPException(status_code=404, detail="Peptide not found")
-    return serialize_doc(doc)
+    return serialize_doc(doc) if peptides_col is not None else doc
 
 @app.post("/api/peptides/generate")
 async def generate_peptide(req: PeptideGenerateRequest):
@@ -694,7 +714,8 @@ async def get_news(
 @app.get("/api/stats")
 async def get_stats():
     """Get platform statistics"""
-    require_db()
+    if peptides_col is None:
+        return {"peptides_in_db": len(_FALLBACK_PEPTIDES), "total_peptides_tracked": len(IMPORTANT_PEPTIDES), "data_sources": ["ClinicalTrials.gov", "PubMed", "AI-Generated"], "last_updated": datetime.utcnow().isoformat()}
     peptide_count = peptides_col.count_documents({})
 
     return {
