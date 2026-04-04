@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 
 # ─── MONGODB ─────────────────────────────────────────────────
 try:
-    client = MongoClient(MONGO_URL, serverSelectionTimeoutMS=5000)
+    client = MongoClient(MONGO_URL, serverSelectionTimeoutMS=10000, tlsAllowInvalidCertificates=False)
     db = client[DB_NAME]
     peptides_col = db["peptides"]
     trials_cache_col = db["trials_cache"]
@@ -55,6 +55,10 @@ except Exception as e:
     news_cache_col = None
 
 # ─── HELPERS ─────────────────────────────────────────────────
+def require_db():
+    if peptides_col is None:
+        raise HTTPException(status_code=503, detail="Database not connected. Check MONGO_URL environment variable.")
+
 def serialize_doc(doc):
     """Convert MongoDB document to JSON-serializable dict"""
     if doc is None:
@@ -408,6 +412,7 @@ async def get_peptides(
     limit: int = 20
 ):
     """Get all peptides with optional search/filter"""
+    require_db()
     filter_q = {}
     if query:
         filter_q["$or"] = [
@@ -689,8 +694,9 @@ async def get_news(
 @app.get("/api/stats")
 async def get_stats():
     """Get platform statistics"""
+    require_db()
     peptide_count = peptides_col.count_documents({})
-    
+
     return {
         "peptides_in_db": peptide_count,
         "total_peptides_tracked": len(IMPORTANT_PEPTIDES),
