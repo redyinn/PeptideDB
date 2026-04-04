@@ -31,18 +31,28 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # ─── MONGODB ─────────────────────────────────────────────────
-client = MongoClient(MONGO_URL)
-db = client[DB_NAME]
-peptides_col = db["peptides"]
-trials_cache_col = db["trials_cache"]
-papers_cache_col = db["papers_cache"]
-news_cache_col = db["news_cache"]
+try:
+    client = MongoClient(MONGO_URL, serverSelectionTimeoutMS=5000)
+    db = client[DB_NAME]
+    peptides_col = db["peptides"]
+    trials_cache_col = db["trials_cache"]
+    papers_cache_col = db["papers_cache"]
+    news_cache_col = db["news_cache"]
 
-# Create indexes
-peptides_col.create_index([("slug", ASCENDING)], unique=True)
-peptides_col.create_index([("name", TEXT), ("category", TEXT)])
-trials_cache_col.create_index([("query", ASCENDING)])
-papers_cache_col.create_index([("query", ASCENDING)])
+    # Create indexes
+    peptides_col.create_index([("slug", ASCENDING)], unique=True)
+    peptides_col.create_index([("name", TEXT), ("category", TEXT)])
+    trials_cache_col.create_index([("query", ASCENDING)])
+    papers_cache_col.create_index([("query", ASCENDING)])
+    logger.info("MongoDB connected successfully")
+except Exception as e:
+    logger.error(f"MongoDB connection error: {e}")
+    client = None
+    db = None
+    peptides_col = None
+    trials_cache_col = None
+    papers_cache_col = None
+    news_cache_col = None
 
 # ─── HELPERS ─────────────────────────────────────────────────
 def serialize_doc(doc):
