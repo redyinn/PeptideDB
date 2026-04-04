@@ -561,29 +561,19 @@ async def get_trials(
 ):
     """Fetch clinical trials from ClinicalTrials.gov"""
     cache_key = f"{query}_{company}_{status}"
-    
-    # Check cache (1 hour)
-    cached = trials_cache_col.find_one({"query": cache_key})
-    if cached:
-        cached_time = datetime.fromisoformat(cached.get("cached_at", "2000-01-01"))
-        if datetime.utcnow() - cached_time < timedelta(hours=1):
-            return {
-                "trials": cached.get("trials", []),
-                "total": len(cached.get("trials", [])),
-                "cached": True,
-                "query": query,
-                "company": company,
-                "status": status
-            }
-    
+
+    # Check cache (1 hour) - only if DB available
+    if trials_cache_col is not None:
+        cached = trials_cache_col.find_one({"query": cache_key})
+        if cached:
+            cached_time = datetime.fromisoformat(cached.get("cached_at", "2000-01-01"))
+            if datetime.utcnow() - cached_time < timedelta(hours=1):
+                return {"trials": cached.get("trials", []), "total": len(cached.get("trials", [])), "cached": True, "query": query, "company": company, "status": status}
+
     trials = fetch_clinical_trials(query, company, status, page_size)
-    
-    # Cache results
-    trials_cache_col.update_one(
-        {"query": cache_key},
-        {"$set": {"trials": trials, "cached_at": datetime.utcnow().isoformat(), "query": cache_key}},
-        upsert=True
-    )
+
+    if trials_cache_col is not None:
+        trials_cache_col.update_one({"query": cache_key}, {"$set": {"trials": trials, "cached_at": datetime.utcnow().isoformat(), "query": cache_key}}, upsert=True)
     
     return {
         "trials": trials,
@@ -604,33 +594,18 @@ async def get_papers(
 ):
     """Fetch papers from PubMed"""
     cache_key = f"{query}_{sort}_{max_results}"
-    
-    # Check cache (1 hour)
-    cached = papers_cache_col.find_one({"query": cache_key})
-    if cached:
-        cached_time = datetime.fromisoformat(cached.get("cached_at", "2000-01-01"))
-        if datetime.utcnow() - cached_time < timedelta(hours=1):
-            return {
-                "papers": cached.get("papers", []),
-                "total_available": cached.get("total_available", 0),
-                "cached": True,
-                "query": query,
-                "sort": sort
-            }
-    
+
+    if papers_cache_col is not None:
+        cached = papers_cache_col.find_one({"query": cache_key})
+        if cached:
+            cached_time = datetime.fromisoformat(cached.get("cached_at", "2000-01-01"))
+            if datetime.utcnow() - cached_time < timedelta(hours=1):
+                return {"papers": cached.get("papers", []), "total_available": cached.get("total_available", 0), "cached": True, "query": query, "sort": sort}
+
     papers, total = fetch_pubmed_papers(query, max_results, sort)
-    
-    # Cache results
-    papers_cache_col.update_one(
-        {"query": cache_key},
-        {"$set": {
-            "papers": papers,
-            "total_available": total,
-            "cached_at": datetime.utcnow().isoformat(),
-            "query": cache_key
-        }},
-        upsert=True
-    )
+
+    if papers_cache_col is not None:
+        papers_cache_col.update_one({"query": cache_key}, {"$set": {"papers": papers, "total_available": total, "cached_at": datetime.utcnow().isoformat(), "query": cache_key}}, upsert=True)
     
     return {
         "papers": papers,
@@ -650,16 +625,12 @@ async def get_news(
     """Get latest peptide news (from recent PubMed papers and trial updates)"""
     cache_key = f"news_{topic}_{limit}"
     
-    cached = news_cache_col.find_one({"query": cache_key})
-    if cached:
-        cached_time = datetime.fromisoformat(cached.get("cached_at", "2000-01-01"))
-        if datetime.utcnow() - cached_time < timedelta(hours=2):
-            return {
-                "news": cached.get("news", []),
-                "total": len(cached.get("news", [])),
-                "cached": True,
-                "topic": topic
-            }
+    if news_cache_col is not None:
+        cached = news_cache_col.find_one({"query": cache_key})
+        if cached:
+            cached_time = datetime.fromisoformat(cached.get("cached_at", "2000-01-01"))
+            if datetime.utcnow() - cached_time < timedelta(hours=2):
+                return {"news": cached.get("news", []), "total": len(cached.get("news", [])), "cached": True, "topic": topic}
     
     news_items = []
     
@@ -695,12 +666,8 @@ async def get_news(
     news_items.sort(key=lambda x: x.get("date", ""), reverse=True)
     news_items = news_items[:limit]
     
-    # Cache
-    news_cache_col.update_one(
-        {"query": cache_key},
-        {"$set": {"news": news_items, "cached_at": datetime.utcnow().isoformat(), "query": cache_key}},
-        upsert=True
-    )
+    if news_cache_col is not None:
+        news_cache_col.update_one({"query": cache_key}, {"$set": {"news": news_items, "cached_at": datetime.utcnow().isoformat(), "query": cache_key}}, upsert=True)
     
     return {
         "news": news_items,
