@@ -1,10 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Search, ArrowRight, FlaskConical, BookOpen, TestTube, Newspaper, ExternalLink, TrendingUp } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { SplineScene } from '../components/ui/splite';
+import { Spotlight } from '../components/ui/spotlight';
+import { LampContainer } from '../components/ui/lamp';
+import AnimatedShaderBackground from '../components/ui/animated-shader-background';
 import { Badge } from '../components/ui/badge';
 import { Skeleton } from '../components/ui/skeleton';
 import { getPeptides, getTrials, getPapers, getStats, seedPeptides, getSeedStatus } from '../lib/api';
@@ -39,6 +43,11 @@ export default function HomePage() {
   const navigate = useNavigate();
   const lang = i18n.language;
   const [searchQuery, setSearchQuery] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [suggestLoading, setSuggestLoading] = useState(false);
+  const searchRef = useRef(null);
+  const debounceRef = useRef(null);
   const [peptides, setPeptides] = useState([]);
   const [trials, setTrials] = useState([]);
   const [papers, setPapers] = useState([]);
@@ -93,8 +102,32 @@ export default function HomePage() {
 
   const handleSearch = (e) => {
     e.preventDefault();
+    setShowSuggestions(false);
     if (searchQuery.trim()) navigate(`/encyclopedia?q=${encodeURIComponent(searchQuery.trim())}`);
   };
+
+  const handleSearchChange = (e) => {
+    const val = e.target.value;
+    setSearchQuery(val);
+    clearTimeout(debounceRef.current);
+    if (!val.trim()) { setSuggestions([]); setShowSuggestions(false); return; }
+    debounceRef.current = setTimeout(async () => {
+      setSuggestLoading(true);
+      try {
+        const res = await getPeptides({ query: val.trim(), limit: 6 });
+        setSuggestions(res.data.peptides || []);
+        setShowSuggestions(true);
+      } catch { setSuggestions([]); }
+      setSuggestLoading(false);
+    }, 280);
+  };
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e) => { if (searchRef.current && !searchRef.current.contains(e.target)) setShowSuggestions(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   const getStatusClass = (status) => {
     const s = (status || '').toLowerCase();
@@ -106,90 +139,155 @@ export default function HomePage() {
 
   return (
     <div>
-      {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="hero-gradient absolute inset-0" />
-        <div className="noise relative" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20 lg:pt-24 lg:pb-28">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-            {/* Left: Copy + Search */}
-            <motion.div
-              className="lg:col-span-7"
-              initial="hidden"
-              animate="visible"
-              variants={fadeUp}
-              custom={0}
-            >
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground leading-tight" style={{ fontFamily: 'Space Grotesk' }}>
-                {t('home.hero_title')}
-              </h1>
-              <p className="mt-5 text-base md:text-lg text-muted-foreground max-w-[56ch] leading-7">
-                {t('home.hero_subtitle')}
-              </p>
-
-              {/* Search */}
-              <form onSubmit={handleSearch} className="mt-8 flex gap-2 max-w-xl">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-muted-foreground" />
-                  <input
-                    data-testid="hero-search-input"
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder={t('home.search_placeholder')}
-                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
-                  />
-                </div>
-                <Button type="submit" data-testid="hero-search-submit" className="btn-press px-5 rounded-xl">
-                  <Search className="w-4 h-4" />
-                </Button>
-              </form>
-
-              <div className="mt-6 flex flex-wrap gap-3">
-                <Button asChild variant="default" className="btn-press rounded-xl gap-2">
-                  <Link to="/encyclopedia">
-                    {t('home.explore_encyclopedia')} <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" className="btn-press rounded-xl gap-2">
-                  <Link to="/studies?company=Eli+Lilly">
-                    {t('home.track_studies')}
-                  </Link>
-                </Button>
-              </div>
-            </motion.div>
-
-            {/* Right: Live Signals */}
-            <motion.div
-              className="lg:col-span-5 space-y-4"
-              initial="hidden"
-              animate="visible"
-              variants={fadeUp}
-              custom={2}
-            >
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">
-                {t('home.live_signals')}
-              </p>
-
-              {/* Quick stats */}
-              <div className="grid grid-cols-2 gap-3">
-                <StatCard icon={FlaskConical} label={t('home.stats_peptides')} value={stats?.peptides_in_db || 0} loading={loading} />
-                <StatCard icon={TestTube} label={t('home.stats_trials')} value={trials.length || '...'} loading={loading} />
-                <StatCard icon={BookOpen} label={t('home.stats_papers')} value={papers.length || '...'} loading={loading} />
-                <StatCard icon={TrendingUp} label={t('home.stats_sources')} value={stats?.data_sources?.length || 3} loading={loading} />
-              </div>
-
-              {seeding && (
-                <Card className="border-primary/20 bg-accent/50">
-                  <CardContent className="p-4 flex items-center gap-3">
-                    <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                    <span className="text-sm text-primary font-medium">{t('home.generating')}</span>
-                  </CardContent>
-                </Card>
+      {/* Hero Section — Lamp + Shader Background */}
+      <div className="relative">
+        <AnimatedShaderBackground />
+        {/* dark overlay so lamp glow stays readable */}
+        <div className="absolute inset-0 bg-black/50 z-[1]" />
+      <LampContainer className="bg-transparent relative z-10">
+        <motion.h1
+          initial={{ opacity: 0.5, y: 100 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.8, ease: "easeInOut" }}
+          className="bg-gradient-to-br from-slate-100 to-slate-400 py-2 bg-clip-text text-center text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-transparent"
+          style={{ fontFamily: 'Space Grotesk' }}
+        >
+          {t('home.hero_title')}
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0, y: 60 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.7, ease: "easeInOut" }}
+          className="mt-4 text-slate-400 text-base md:text-lg max-w-[52ch] text-center leading-7"
+        >
+          {t('home.hero_subtitle')}
+        </motion.p>
+        <motion.div
+          ref={searchRef}
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.65, duration: 0.7, ease: "easeInOut" }}
+          className="mt-8 w-full max-w-xl relative"
+        >
+          <form onSubmit={handleSearch} className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+              {suggestLoading && (
+                <div className="absolute right-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 border border-cyan-500 border-t-transparent rounded-full animate-spin" />
               )}
-            </motion.div>
-          </div>
+              <input
+                data-testid="hero-search-input"
+                type="text"
+                value={searchQuery}
+                onChange={handleSearchChange}
+                onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+                placeholder={t('home.search_placeholder')}
+                className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-700 bg-slate-900 text-slate-200 text-sm placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/40 focus:border-cyan-500/60 transition-colors"
+                autoComplete="off"
+              />
+            </div>
+            <Button type="submit" data-testid="hero-search-submit" className="btn-press px-5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950">
+              <Search className="w-4 h-4" />
+            </Button>
+          </form>
+
+          {/* Autocomplete Dropdown */}
+          {showSuggestions && suggestions.length > 0 && (
+            <div className="absolute top-full mt-2 left-0 right-12 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl z-50 overflow-hidden">
+              {suggestions.map((p) => (
+                <button
+                  key={p.slug}
+                  onMouseDown={() => { setShowSuggestions(false); navigate(`/encyclopedia/${p.slug}`); }}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-slate-800 transition-colors text-left"
+                >
+                  <FlaskConical className="w-4 h-4 text-cyan-500 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-slate-200 truncate">{p.name}</p>
+                    <p className="text-xs text-slate-500 truncate">{p.category}</p>
+                  </div>
+                  <ArrowRight className="w-3.5 h-3.5 text-slate-600 shrink-0" />
+                </button>
+              ))}
+              <button
+                onMouseDown={handleSearch}
+                className="w-full flex items-center gap-2 px-4 py-2.5 border-t border-slate-800 text-xs text-cyan-400 hover:bg-slate-800 transition-colors"
+              >
+                <Search className="w-3.5 h-3.5" />
+                Alle Ergebnisse für „{searchQuery}" anzeigen
+              </button>
+            </div>
+          )}
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8, duration: 0.6, ease: "easeInOut" }}
+          className="mt-6 flex flex-wrap justify-center gap-3"
+        >
+          <Button asChild variant="default" className="btn-press rounded-xl gap-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 border-0">
+            <Link to="/encyclopedia">
+              {t('home.explore_encyclopedia')} <ArrowRight className="w-4 h-4" />
+            </Link>
+          </Button>
+          <Button asChild variant="outline" className="btn-press rounded-xl gap-2 border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white">
+            <Link to="/studies?company=Eli+Lilly">
+              {t('home.track_studies')}
+            </Link>
+          </Button>
+        </motion.div>
+      </LampContainer>
+      </div>
+
+      {/* Stats Bar */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-4">
+          {t('home.live_signals')}
+        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <StatCard icon={FlaskConical} label={t('home.stats_peptides')} value={stats?.peptides_in_db || 0} loading={loading} />
+          <StatCard icon={TestTube} label={t('home.stats_trials')} value={trials.length || '...'} loading={loading} />
+          <StatCard icon={BookOpen} label={t('home.stats_papers')} value={papers.length || '...'} loading={loading} />
+          <StatCard icon={TrendingUp} label={t('home.stats_sources')} value={stats?.data_sources?.length || 3} loading={loading} />
         </div>
+        {seeding && (
+          <Card className="mt-3 border-primary/20 bg-accent/50">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              <span className="text-sm text-primary font-medium">{t('home.generating')}</span>
+            </CardContent>
+          </Card>
+        )}
+      </section>
+
+      {/* 3D Interactive Banner */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <Card className="w-full h-[420px] bg-black/[0.96] relative overflow-hidden border-border/30">
+          <Spotlight className="-top-40 left-0 md:left-60 md:-top-20" fill="white" />
+          <div className="flex h-full">
+            <div className="flex-1 p-8 relative z-10 flex flex-col justify-center">
+              <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0}>
+                <h2
+                  className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400"
+                  style={{ fontFamily: 'Space Grotesk' }}
+                >
+                  Explore Peptide Science in 3D
+                </h2>
+                <p className="mt-4 text-neutral-400 max-w-sm text-sm leading-relaxed">
+                  Visualize molecular structures and research insights in an interactive 3D environment.
+                </p>
+                <Button asChild variant="outline" className="mt-6 rounded-xl border-neutral-700 text-neutral-200 hover:bg-neutral-800 hover:text-white w-fit">
+                  <a href="/encyclopedia">Browse Encyclopedia</a>
+                </Button>
+              </motion.div>
+            </div>
+            <div className="flex-1 relative">
+              <SplineScene
+                scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+                className="w-full h-full"
+              />
+            </div>
+          </div>
+        </Card>
       </section>
 
       {/* Featured Peptides */}

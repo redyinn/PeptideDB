@@ -425,8 +425,21 @@ async def get_peptides(
         # In-memory fallback
         results = _FALLBACK_PEPTIDES
         if query:
-            q = query.lower()
-            results = [p for p in results if q in p.get("name","").lower() or q in p.get("category","").lower() or q in p.get("slug","").lower()]
+            q = query.lower().strip()
+            q_hyph = q.replace(" ", "-")
+            q_nospace = q.replace(" ", "").replace("-", "")
+            tokens = q.split()
+            def matches(p):
+                name = p.get("name", "").lower()
+                slug = p.get("slug", "").lower()
+                cat  = p.get("category", "").lower()
+                name_norm = name.replace("-", "").replace(" ", "")
+                # exact substring, hyphenated variant, no-separator variant, or all tokens present
+                return (q in name or q in slug or q in cat
+                        or q_hyph in name or q_hyph in slug
+                        or q_nospace in name_norm
+                        or all(t in name or t in slug for t in tokens))
+            results = [p for p in results if matches(p)]
         if category:
             c = category.lower()
             results = [p for p in results if c in p.get("category","").lower()]
@@ -436,10 +449,13 @@ async def get_peptides(
         return {"peptides": results[skip:skip+limit], "total": total, "page": page, "pages": max(1, (total+limit-1)//limit)}
     filter_q = {}
     if query:
+        q_hyph = query.strip().replace(" ", "-")
         filter_q["$or"] = [
             {"name": {"$regex": query, "$options": "i"}},
+            {"name": {"$regex": q_hyph, "$options": "i"}},
             {"category": {"$regex": query, "$options": "i"}},
             {"slug": {"$regex": query, "$options": "i"}},
+            {"slug": {"$regex": q_hyph, "$options": "i"}},
         ]
     if category:
         filter_q["category"] = {"$regex": category, "$options": "i"}
