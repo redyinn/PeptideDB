@@ -223,7 +223,10 @@ def fetch_pubmed_papers(query: str, max_results: int = 20, sort: str = "relevanc
 # ─── OPENAI PEPTIDE GENERATION ───────────────────────────────
 async def generate_peptide_profile(peptide_name: str):
     """Generate comprehensive bilingual peptide profile using OpenAI"""
-    from emergentintegrations.llm.chat import LlmChat, UserMessage
+    try:
+        from emergentintegrations.llm.chat import LlmChat, UserMessage
+    except ImportError:
+        raise HTTPException(status_code=501, detail="AI generation not available in this deployment")
     
     system_prompt = """You are a pharmaceutical research specialist. Generate scientifically accurate peptide profiles.
 Return ONLY valid JSON, no markdown, no code blocks, just the raw JSON object.
