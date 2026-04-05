@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Search, ExternalLink, BookOpen } from 'lucide-react';
@@ -43,6 +44,10 @@ export default function PapersPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <Helmet>
+        <title>Research Papers — PeptideDB</title>
+        <meta name="description" content="Search PubMed research papers on peptide therapeutics. Sort by relevance or date. Access full citations and DOI links." />
+      </Helmet>
       {/* Header */}
       <motion.div initial="hidden" animate="visible" variants={fadeUp} className="mb-8">
         <h1 className="text-3xl md:text-4xl font-semibold tracking-tight" style={{ fontFamily: 'Space Grotesk' }}>

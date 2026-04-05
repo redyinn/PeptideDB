@@ -207,13 +207,19 @@ export default function PeptideDetailPage() {
         <p className="text-base text-muted-foreground max-w-[72ch] leading-7">
           {p.description?.[lang] || p.description?.en || ''}
         </p>
-        {p.updated_at && (
-          <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Clock className="w-3.5 h-3.5" />
-            <span>{t('encyclopedia.last_updated')} {new Date(p.updated_at).toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-            {p.generated_by && <span className="text-muted-foreground/60">({p.generated_by})</span>}
-          </div>
-        )}
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          {p.updated_at && (
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Clock className="w-3.5 h-3.5" />
+              <span>{t('encyclopedia.last_updated')} {new Date(p.updated_at).toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+            </div>
+          )}
+          {p.generated_by && (
+            <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-md bg-secondary text-muted-foreground border border-border/50">
+              ✦ {lang === 'de' ? 'KI-generiert' : 'AI-generated'} · {p.generated_by}
+            </span>
+          )}
+        </div>
       </motion.div>
 
       {/* Tabs */}
@@ -436,13 +442,13 @@ export default function PeptideDetailPage() {
                     <div key={i} className="p-3 rounded-lg border border-border/50">
                       <div className="flex items-center gap-2 mb-1">
                         <h4 className="text-sm font-semibold">{lang === 'de' ? se.name_de : se.name_en}</h4>
-                        <Badge variant="outline" className={`text-xs ${
-                          se.severity === 'severe' ? 'border-red-300 text-red-600' :
-                          se.severity === 'moderate' ? 'border-amber-300 text-amber-600' :
-                          'border-green-300 text-green-600'
-                        }`}>
-                          {se.severity}
-                        </Badge>
+                        <div className="flex items-center gap-0.5" title={se.severity}>
+                          {[1,2,3].map(d => {
+                            const filled = se.severity === 'severe' ? true : se.severity === 'moderate' ? d <= 2 : d <= 1;
+                            const color = se.severity === 'severe' ? 'bg-red-500' : se.severity === 'moderate' ? 'bg-amber-500' : 'bg-green-500';
+                            return <span key={d} className={`w-2 h-2 rounded-full ${filled ? color : 'bg-border'}`} />;
+                          })}
+                        </div>
                         <Badge variant="outline" className="text-xs">{se.frequency}</Badge>
                       </div>
                       <p className="text-sm text-muted-foreground">

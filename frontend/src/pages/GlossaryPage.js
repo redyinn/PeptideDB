@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Search, BookOpen } from 'lucide-react';
@@ -62,6 +63,10 @@ export default function GlossaryPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <Helmet>
+        <title>Peptide Glossary — PeptideDB</title>
+        <meta name="description" content="Bilingual glossary of peptide research terms. Definitions for amino acids, bioavailability, GLP-1, half-life, and more in English and German." />
+      </Helmet>
       {/* Header */}
       <motion.div initial="hidden" animate="visible" variants={fadeUp} className="mb-8">
         <h1 className="text-3xl md:text-4xl font-semibold tracking-tight" style={{ fontFamily: 'Space Grotesk' }}>

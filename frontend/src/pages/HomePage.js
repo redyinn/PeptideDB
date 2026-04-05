@@ -218,7 +218,7 @@ export default function HomePage() {
                 className="w-full flex items-center gap-2 px-4 py-2.5 border-t border-slate-800 text-xs text-cyan-400 hover:bg-slate-800 transition-colors"
               >
                 <Search className="w-3.5 h-3.5" />
-                Alle Ergebnisse für „{searchQuery}" anzeigen
+                {lang === 'de' ? `Alle Ergebnisse für „${searchQuery}" anzeigen` : `Show all results for "${searchQuery}"`}
               </button>
             </div>
           )}
