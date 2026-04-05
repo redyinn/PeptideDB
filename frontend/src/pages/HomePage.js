@@ -3,11 +3,9 @@ import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Search, ArrowRight, FlaskConical, BookOpen, TestTube, Newspaper, ExternalLink, TrendingUp } from 'lucide-react';
+import { Search, ArrowRight, FlaskConical, BookOpen, TestTube, ExternalLink, TrendingUp } from 'lucide-react';
 import { Button } from '../components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { SplineScene } from '../components/ui/splite';
-import { Spotlight } from '../components/ui/spotlight';
+import { Card, CardContent } from '../components/ui/card';
 import { LampContainer } from '../components/ui/lamp';
 import AnimatedShaderBackground from '../components/ui/animated-shader-background';
 import { Badge } from '../components/ui/badge';
@@ -264,37 +262,6 @@ export default function HomePage() {
         )}
       </section>
 
-      {/* 3D Interactive Banner */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <Card className="w-full h-[420px] bg-black/[0.96] relative overflow-hidden border-border/30">
-          <Spotlight className="-top-40 left-0 md:left-60 md:-top-20" fill="white" />
-          <div className="flex h-full">
-            <div className="flex-1 p-8 relative z-10 flex flex-col justify-center">
-              <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0}>
-                <h2
-                  className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400"
-                  style={{ fontFamily: 'Space Grotesk' }}
-                >
-                  Explore Peptide Science in 3D
-                </h2>
-                <p className="mt-4 text-neutral-400 max-w-sm text-sm leading-relaxed">
-                  Visualize molecular structures and research insights in an interactive 3D environment.
-                </p>
-                <Button asChild variant="outline" className="mt-6 rounded-xl border-neutral-700 text-neutral-200 hover:bg-neutral-800 hover:text-white w-fit">
-                  <a href="/encyclopedia">Browse Encyclopedia</a>
-                </Button>
-              </motion.div>
-            </div>
-            <div className="flex-1 relative hidden md:block">
-              <SplineScene
-                scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-                className="w-full h-full"
-              />
-            </div>
-          </div>
-        </Card>
-      </section>
-
       {/* Featured Peptides */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="flex items-center justify-between mb-8">
@@ -414,60 +381,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Recent Papers */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="flex items-center justify-between mb-8">
-          <motion.h2
-            className="text-xl md:text-2xl font-semibold tracking-tight"
-            style={{ fontFamily: 'Space Grotesk' }}
-            initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}
-          >
-            {t('home.recent_papers')}
-          </motion.h2>
-          <Link to="/papers" className="text-sm text-primary font-medium hover:underline flex items-center gap-1">
-            {t('home.view_all')} <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {loading ? (
-            Array.from({ length: 3 }).map((_, i) => (
-              <Card key={i} className="border border-border/50">
-                <CardContent className="p-5 space-y-3">
-                  <Skeleton className="h-5 w-full" />
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                </CardContent>
-              </Card>
-            ))
-          ) : papers.length > 0 ? (
-            papers.slice(0, 3).map((paper, i) => (
-              <motion.a
-                key={paper.pmid || i}
-                href={paper.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={i}
-              >
-                <div className="card-hover rounded-xl border border-border/20 h-full" data-testid={`paper-card-${i}`}>
-                  <div className="p-5">
-                    <p className="text-sm font-medium text-foreground line-clamp-2 leading-relaxed mb-2">
-                      {paper.title}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {paper.authors?.slice(0, 2).join(', ')}{paper.authors?.length > 2 ? ' et al.' : ''}
-                    </p>
-                    <div className="mt-3 flex items-center gap-2">
-                      <Badge variant="outline" className="text-xs">{paper.journal}</Badge>
-                      <span className="text-xs text-muted-foreground">{paper.pub_date}</span>
-                    </div>
-                  </div>
-                </div>
-              </motion.a>
-            ))
-          ) : null}
-        </div>
-      </section>
     </div>
   );
 }

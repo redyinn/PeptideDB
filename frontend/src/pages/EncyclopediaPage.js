@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Search, FlaskConical, Sparkles, Loader2, Target, GitCompareArrows, Clock } from 'lucide-react';
+import { Search, FlaskConical, Sparkles, Loader2, Target, GitCompareArrows } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -223,16 +223,6 @@ export default function EncyclopediaPage() {
                             )}
                           </div>
                         ) : null;
-                      })()}
-                      {p.updated_at && (() => {
-                        const freshness = getFreshness(p.updated_at);
-                        return (
-                          <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
-                            {freshness && <span className={`w-1.5 h-1.5 rounded-full ${freshness.color} shrink-0`} />}
-                            <Clock className="w-3 h-3" />
-                            <span>{t('encyclopedia.last_updated')} {formatDate(p.updated_at, lang)}</span>
-                          </div>
-                        );
                       })()}
                     </CardContent>
                   </Link>
