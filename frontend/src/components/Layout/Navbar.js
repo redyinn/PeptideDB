@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Search, Globe, FlaskConical, Moon, Sun } from 'lucide-react';
+import { Menu, X, Search, Globe, FlaskConical, Moon, Sun, Calculator } from 'lucide-react';
 import { Button } from '../ui/button';
 
 const navItems = [
@@ -83,6 +83,17 @@ export default function Navbar() {
 
             {/* Right side */}
             <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                asChild
+                className="w-9 h-9"
+                title="Dosage Calculator"
+              >
+                <Link to="/calculator">
+                  <Calculator className="w-4 h-4" />
+                </Link>
+              </Button>
               <Button
                 variant="ghost"
                 size="icon"
