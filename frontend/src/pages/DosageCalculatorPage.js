@@ -1,44 +1,35 @@
 import React, { useState, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calculator, AlertTriangle, CheckCircle2, Info, Syringe, FlaskConical, Droplets, Pill } from 'lucide-react';
+import { Calculator, AlertTriangle, CheckCircle2, Syringe } from 'lucide-react';
 import { Card, CardContent } from '../components/ui/card';
 
-// ─── Option Group ─────────────────────────────────────────────────────────────
-function OptionGroup({ label, icon: Icon, options, value, onChange, customValue, onCustomChange, unit }) {
+// ─── Pill toggle button ───────────────────────────────────────────────────────
+function Opt({ label, active, onClick }) {
   return (
-    <div className="space-y-3">
-      <div className="flex items-center gap-2">
-        <Icon className="w-4 h-4 text-primary" />
-        <span className="text-sm font-semibold text-foreground" style={{ fontFamily: 'Space Grotesk' }}>{label}</span>
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {options.map(opt => {
-          const isSelected = value === opt.value;
-          return (
-            <button
-              key={opt.value}
-              onClick={() => onChange(opt.value)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-all duration-150 ${
-                isSelected
-                  ? 'bg-primary text-primary-foreground border-primary shadow-sm'
-                  : 'bg-secondary/50 text-muted-foreground border-border hover:border-primary/40 hover:text-foreground'
-              }`}
-            >
-              {opt.label}
-            </button>
-          );
-        })}
-        <button
-          onClick={() => onChange('custom')}
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-all duration-150 ${
-            value === 'custom'
-              ? 'bg-primary text-primary-foreground border-primary shadow-sm'
-              : 'bg-secondary/50 text-muted-foreground border-border hover:border-primary/40 hover:text-foreground'
-          }`}
-        >
-          Other
-        </button>
+    <button
+      onClick={onClick}
+      className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-all duration-150 ${
+        active
+          ? 'bg-primary text-primary-foreground border-primary'
+          : 'bg-transparent text-muted-foreground border-border hover:border-primary/50 hover:text-foreground'
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
+
+// ─── Input section ────────────────────────────────────────────────────────────
+function Section({ label, options, value, onChange, customVal, onCustomVal, unit }) {
+  return (
+    <div className="space-y-2">
+      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{label}</p>
+      <div className="flex flex-wrap gap-1.5">
+        {options.map(o => (
+          <Opt key={o.v} label={o.l} active={value === o.v} onClick={() => onChange(o.v)} />
+        ))}
+        <Opt label="Other" active={value === 'custom'} onClick={() => onChange('custom')} />
       </div>
       <AnimatePresence>
         {value === 'custom' && (
@@ -49,15 +40,15 @@ function OptionGroup({ label, icon: Icon, options, value, onChange, customValue,
             transition={{ duration: 0.15 }}
             className="overflow-hidden"
           >
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 pt-1">
               <input
                 type="number"
                 min="0"
                 step="any"
-                placeholder="Enter value"
-                value={customValue}
-                onChange={e => onCustomChange(e.target.value)}
-                className="w-36 px-3 py-1.5 rounded-lg text-sm border border-border bg-background text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-colors"
+                placeholder="0"
+                value={customVal}
+                onChange={e => onCustomVal(e.target.value)}
+                className="w-28 px-3 py-1.5 rounded-lg text-sm border border-border bg-background text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30"
               />
               {unit && <span className="text-sm text-muted-foreground">{unit}</span>}
             </div>
@@ -68,58 +59,39 @@ function OptionGroup({ label, icon: Icon, options, value, onChange, customValue,
   );
 }
 
-// ─── Syringe Ruler ────────────────────────────────────────────────────────────
-function SyringeRuler({ units, maxUnits, valid }) {
-  const pct = Math.min(units / maxUnits, 1) * 100;
-  const ticks = Array.from({ length: maxUnits + 1 }, (_, i) => i);
-  const labelInterval = maxUnits <= 30 ? 5 : maxUnits <= 50 ? 10 : 20;
+// ─── Syringe ruler ────────────────────────────────────────────────────────────
+function Ruler({ units, max }) {
+  const pct = Math.min(units / max, 1) * 100;
+  const step = max <= 30 ? 5 : max <= 50 ? 10 : 20;
+  const labels = Array.from({ length: Math.floor(max / step) + 1 }, (_, i) => i * step);
 
   return (
-    <div className="space-y-2">
-      {/* Ruler bar */}
-      <div className="relative h-8 rounded-lg overflow-hidden bg-secondary/60 border border-border">
-        {/* Fill */}
+    <div className="space-y-1.5">
+      <div className="relative h-7 rounded-lg overflow-hidden bg-secondary/50 border border-border">
         <motion.div
-          className={`absolute inset-y-0 left-0 rounded-lg transition-all ${valid ? 'bg-primary' : 'bg-destructive/60'}`}
-          initial={{ width: 0 }}
+          className="absolute inset-y-0 left-0 bg-primary rounded-lg"
           animate={{ width: `${pct}%` }}
-          transition={{ type: 'spring', stiffness: 120, damping: 20 }}
+          transition={{ type: 'spring', stiffness: 140, damping: 22 }}
         />
-        {/* Tick marks */}
-        <div className="absolute inset-0 flex">
-          {ticks.map(i => {
-            const pos = (i / maxUnits) * 100;
-            const isMajor = i % labelInterval === 0;
-            return (
-              <div
-                key={i}
-                className="absolute top-0 bottom-0"
-                style={{ left: `${pos}%` }}
-              >
-                <div className={`w-px h-full ${isMajor ? 'bg-border/80' : 'bg-border/30'}`} />
-              </div>
-            );
-          })}
-        </div>
-        {/* Cursor line */}
-        <AnimatePresence>
-          {units > 0 && (
-            <motion.div
-              className="absolute top-0 bottom-0 w-0.5 bg-white/90 shadow-lg"
-              initial={{ left: '0%' }}
-              animate={{ left: `${pct}%` }}
-              transition={{ type: 'spring', stiffness: 120, damping: 20 }}
-            />
-          )}
-        </AnimatePresence>
+        {labels.map(i => (
+          <div
+            key={i}
+            className="absolute top-0 bottom-0 w-px bg-border/40"
+            style={{ left: `${(i / max) * 100}%` }}
+          />
+        ))}
+        <motion.div
+          className="absolute top-0 bottom-0 w-0.5 bg-white/80"
+          animate={{ left: `${pct}%` }}
+          transition={{ type: 'spring', stiffness: 140, damping: 22 }}
+        />
       </div>
-      {/* Labels */}
-      <div className="relative h-4 text-xs text-muted-foreground select-none">
-        {ticks.filter(i => i % labelInterval === 0).map(i => (
+      <div className="relative h-3">
+        {labels.map(i => (
           <span
             key={i}
-            className="absolute -translate-x-1/2"
-            style={{ left: `${(i / maxUnits) * 100}%` }}
+            className="absolute text-[10px] text-muted-foreground -translate-x-1/2"
+            style={{ left: `${(i / max) * 100}%` }}
           >
             {i}
           </span>
@@ -129,307 +101,142 @@ function SyringeRuler({ units, maxUnits, valid }) {
   );
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
-const SYRINGE_OPTIONS = [
-  { value: '0.3/30', label: '0.3 ml · 30u' },
-  { value: '0.5/50', label: '0.5 ml · 50u' },
-  { value: '1.0/100', label: '1.0 ml · 100u' },
+// ─── Page ─────────────────────────────────────────────────────────────────────
+const SYRINGES = [
+  { v: '0.3/30', l: '0.3 ml · 30u' },
+  { v: '0.5/50', l: '0.5 ml · 50u' },
+  { v: '1.0/100', l: '1.0 ml · 100u' },
 ];
-
-const VIAL_OPTIONS = [
-  { value: '5', label: '5 mg' },
-  { value: '10', label: '10 mg' },
-  { value: '15', label: '15 mg' },
-  { value: '20', label: '20 mg' },
+const VIALS = [
+  { v: '5', l: '5 mg' }, { v: '10', l: '10 mg' },
+  { v: '15', l: '15 mg' }, { v: '20', l: '20 mg' },
 ];
-
-const WATER_OPTIONS = [
-  { value: '1', label: '1 ml' },
-  { value: '2', label: '2 ml' },
-  { value: '3', label: '3 ml' },
-  { value: '5', label: '5 ml' },
+const WATER = [
+  { v: '1', l: '1 ml' }, { v: '2', l: '2 ml' },
+  { v: '3', l: '3 ml' }, { v: '5', l: '5 ml' },
 ];
-
-const DOSE_OPTIONS = [
-  { value: '0.05', label: '50 mcg' },
-  { value: '0.1', label: '100 mcg' },
-  { value: '0.25', label: '250 mcg' },
-  { value: '0.5', label: '500 mcg' },
-  { value: '1', label: '1 mg' },
-  { value: '2.5', label: '2.5 mg' },
-  { value: '5', label: '5 mg' },
-  { value: '10', label: '10 mg' },
+const DOSES = [
+  { v: '0.05', l: '50 mcg' }, { v: '0.1', l: '100 mcg' },
+  { v: '0.25', l: '250 mcg' }, { v: '0.5', l: '500 mcg' },
+  { v: '1', l: '1 mg' }, { v: '2.5', l: '2.5 mg' },
+  { v: '5', l: '5 mg' }, { v: '10', l: '10 mg' },
 ];
 
 export default function DosageCalculatorPage() {
   const [syringe, setSyringe] = useState('0.5/50');
   const [vial, setVial] = useState('10');
-  const [customVial, setCustomVial] = useState('');
+  const [cvial, setCvial] = useState('');
   const [water, setWater] = useState('2');
-  const [customWater, setCustomWater] = useState('');
+  const [cwater, setCwater] = useState('');
   const [dose, setDose] = useState('1');
-  const [customDose, setCustomDose] = useState('');
+  const [cdose, setCdose] = useState('');
 
-  const calc = useMemo(() => {
-    const [syringeVol, syringeUnits] = syringe.split('/').map(Number);
-
-    const vialMg = vial === 'custom' ? parseFloat(customVial) : parseFloat(vial);
-    const waterMl = water === 'custom' ? parseFloat(customWater) : parseFloat(water);
-    const doseMg = dose === 'custom' ? parseFloat(customDose) : parseFloat(dose);
-
-    if (!vialMg || !waterMl || !doseMg || vialMg <= 0 || waterMl <= 0 || doseMg <= 0) {
-      return { ready: false };
-    }
-
-    const concentration = vialMg / waterMl; // mg/ml
-    const volumeNeeded = doseMg / concentration; // ml
-    const units = (volumeNeeded / syringeVol) * syringeUnits;
-    const fits = volumeNeeded <= syringeVol;
-
-    return {
-      ready: true,
-      concentration,
-      volumeNeeded,
-      units,
-      syringeUnits,
-      syringeVol,
-      fits,
-      roundedUnits: Math.round(units * 10) / 10,
-    };
-  }, [syringe, vial, customVial, water, customWater, dose, customDose]);
+  const r = useMemo(() => {
+    const [svol, sunits] = syringe.split('/').map(Number);
+    const vmg = vial === 'custom' ? parseFloat(cvial) : parseFloat(vial);
+    const wml = water === 'custom' ? parseFloat(cwater) : parseFloat(water);
+    const dmg = dose === 'custom' ? parseFloat(cdose) : parseFloat(dose);
+    if (!vmg || !wml || !dmg || vmg <= 0 || wml <= 0 || dmg <= 0) return null;
+    const conc = vmg / wml;
+    const vol = dmg / conc;
+    const units = (vol / svol) * sunits;
+    return { conc, vol, units: Math.round(units * 10) / 10, sunits, svol, fits: vol <= svol };
+  }, [syringe, vial, cvial, water, cwater, dose, cdose]);
 
   return (
     <div className="min-h-screen">
       <Helmet>
         <title>Peptide Dosage Calculator — PeptideDB</title>
-        <meta name="description" content="Calculate exact injection volume for reconstituted peptides. Enter your vial size, bacteriostatic water, and desired dose to get precise syringe units." />
+        <meta name="description" content="Calculate exact syringe units for reconstituted peptides." />
       </Helmet>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10 space-y-5">
 
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="space-y-3"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-              <Calculator className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold" style={{ fontFamily: 'Space Grotesk' }}>Peptide Dosage Calculator</h1>
-              <p className="text-sm text-muted-foreground">Reconstitution · Injection volume · Syringe units</p>
-            </div>
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+            <Calculator className="w-4 h-4 text-primary" />
           </div>
-
-          {/* Disclaimer */}
-          <div className="flex items-start gap-2.5 px-4 py-3 rounded-xl bg-amber-500/8 border border-amber-500/20 text-sm text-amber-700 dark:text-amber-400">
-            <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
-            <span>
-              For research purposes only. Consult a qualified healthcare professional before any administration.
-              Always verify calculations independently.
-            </span>
+          <div>
+            <h1 className="text-xl font-bold" style={{ fontFamily: 'Space Grotesk' }}>Dosage Calculator</h1>
+            <p className="text-xs text-muted-foreground">Peptide reconstitution · syringe units</p>
           </div>
-        </motion.div>
+        </div>
 
-        {/* Calculator inputs */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.08 }}
-        >
-          <Card className="border-border">
-            <CardContent className="p-6 space-y-7">
-
-              {/* Row 1: Syringe + Vial */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-7">
-                <OptionGroup
-                  label="Syringe volume"
-                  icon={Syringe}
-                  options={SYRINGE_OPTIONS}
-                  value={syringe}
-                  onChange={setSyringe}
-                  customValue=""
-                  onCustomChange={() => {}}
-                />
-                <OptionGroup
-                  label="Peptide vial quantity"
-                  icon={FlaskConical}
-                  options={VIAL_OPTIONS}
-                  value={vial}
-                  onChange={setVial}
-                  customValue={customVial}
-                  onCustomChange={setCustomVial}
-                  unit="mg"
-                />
-              </div>
-
-              <div className="h-px bg-border/50" />
-
-              {/* Row 2: Water + Dose */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-7">
-                <OptionGroup
-                  label="Bacteriostatic water"
-                  icon={Droplets}
-                  options={WATER_OPTIONS}
-                  value={water}
-                  onChange={setWater}
-                  customValue={customWater}
-                  onCustomChange={setCustomWater}
-                  unit="ml"
-                />
-                <OptionGroup
-                  label="Desired dose"
-                  icon={Pill}
-                  options={DOSE_OPTIONS}
-                  value={dose}
-                  onChange={setDose}
-                  customValue={customDose}
-                  onCustomChange={setCustomDose}
-                  unit="mg"
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+        {/* Inputs */}
+        <Card>
+          <CardContent className="p-5 space-y-5">
+            <Section label="Syringe" options={SYRINGES} value={syringe} onChange={setSyringe} customVal="" onCustomVal={() => {}} />
+            <div className="h-px bg-border/50" />
+            <Section label="Peptide vial" options={VIALS} value={vial} onChange={setVial} customVal={cvial} onCustomVal={setCvial} unit="mg" />
+            <div className="h-px bg-border/50" />
+            <Section label="Bacteriostatic water" options={WATER} value={water} onChange={setWater} customVal={cwater} onCustomVal={setCwater} unit="ml" />
+            <div className="h-px bg-border/50" />
+            <Section label="Desired dose" options={DOSES} value={dose} onChange={setDose} customVal={cdose} onCustomVal={setCdose} unit="mg" />
+          </CardContent>
+        </Card>
 
         {/* Result */}
         <AnimatePresence mode="wait">
-          {calc.ready && (
-            <motion.div
-              key="result"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 6 }}
-              transition={{ duration: 0.35 }}
-            >
-              <Card className={`border ${calc.fits ? 'border-primary/30 bg-primary/3' : 'border-destructive/30 bg-destructive/3'}`}>
-                <CardContent className="p-6 space-y-5">
-
-                  {/* Main result */}
-                  <div className="flex items-start justify-between gap-4 flex-wrap">
+          {r ? (
+            <motion.div key="res" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
+              <Card className={r.fits ? 'border-primary/25' : 'border-destructive/30'}>
+                <CardContent className="p-5 space-y-4">
+                  {/* Main number */}
+                  <div className="flex items-end justify-between">
                     <div>
-                      <p className="text-xs text-muted-foreground uppercase tracking-widest font-medium mb-1">
-                        Pull your syringe to
-                      </p>
-                      <div className="flex items-baseline gap-2">
+                      <p className="text-xs text-muted-foreground mb-1">Pull your syringe to</p>
+                      <div className="flex items-baseline gap-1.5">
                         <span
-                          className={`text-5xl font-bold tabular-nums ${calc.fits ? 'text-primary' : 'text-destructive'}`}
+                          className={`text-5xl font-bold tabular-nums ${r.fits ? 'text-primary' : 'text-destructive'}`}
                           style={{ fontFamily: 'Space Grotesk' }}
                         >
-                          {calc.fits ? calc.roundedUnits : '—'}
+                          {r.fits ? r.units : '—'}
                         </span>
-                        {calc.fits && (
-                          <span className="text-lg font-medium text-muted-foreground">units</span>
-                        )}
+                        {r.fits && <span className="text-base text-muted-foreground font-medium">units</span>}
                       </div>
-                      {calc.fits ? (
-                        <p className="text-sm text-muted-foreground mt-1">
-                          = {(calc.volumeNeeded * 1000).toFixed(1)} µl &nbsp;·&nbsp; {calc.volumeNeeded.toFixed(3)} ml
-                        </p>
-                      ) : (
-                        <p className="text-sm text-destructive mt-1">
-                          Dose exceeds syringe capacity — use a larger syringe or split the dose
-                        </p>
-                      )}
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {r.fits
+                          ? `${(r.vol * 1000).toFixed(1)} µl  ·  ${r.conc.toFixed(2)} mg/ml`
+                          : 'Dose exceeds syringe — use larger syringe or split'}
+                      </p>
                     </div>
-                    <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border ${
-                      calc.fits
+                    <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${
+                      r.fits
                         ? 'bg-green-500/10 text-green-500 border-green-500/20'
                         : 'bg-destructive/10 text-destructive border-destructive/20'
                     }`}>
-                      {calc.fits
-                        ? <><CheckCircle2 className="w-3.5 h-3.5" /> Fits in syringe</>
-                        : <><AlertTriangle className="w-3.5 h-3.5" /> Dose too large</>
-                      }
+                      {r.fits ? <><CheckCircle2 className="w-3 h-3" /> OK</> : <><AlertTriangle className="w-3 h-3" /> Error</>}
                     </div>
                   </div>
 
-                  {/* Syringe ruler */}
-                  {calc.fits && (
-                    <div className="space-y-1.5">
-                      <p className="text-xs text-muted-foreground">
-                        Syringe: 0 – {calc.syringeUnits} units ({calc.syringeVol} ml)
-                      </p>
-                      <SyringeRuler
-                        units={calc.roundedUnits}
-                        maxUnits={calc.syringeUnits}
-                        valid={calc.fits}
-                      />
+                  {/* Ruler */}
+                  {r.fits && (
+                    <div>
+                      <div className="flex items-center gap-1.5 mb-2">
+                        <Syringe className="w-3 h-3 text-muted-foreground" />
+                        <span className="text-xs text-muted-foreground">0 – {r.sunits} units ({r.svol} ml)</span>
+                      </div>
+                      <Ruler units={r.units} max={r.sunits} />
                     </div>
                   )}
-
-                  {/* Info pills */}
-                  <div className="flex flex-wrap gap-2 pt-1">
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary/60 border border-border text-xs text-muted-foreground">
-                      <Info className="w-3 h-3" />
-                      <span>Concentration: <strong className="text-foreground">{calc.concentration.toFixed(2)} mg/ml</strong></span>
-                    </div>
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary/60 border border-border text-xs text-muted-foreground">
-                      <Info className="w-3 h-3" />
-                      <span>Volume needed: <strong className="text-foreground">{calc.volumeNeeded.toFixed(3)} ml</strong></span>
-                    </div>
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary/60 border border-border text-xs text-muted-foreground">
-                      <Info className="w-3 h-3" />
-                      <span>Units to pull: <strong className="text-foreground">{calc.roundedUnits}u / {calc.syringeUnits}u total</strong></span>
-                    </div>
-                  </div>
                 </CardContent>
               </Card>
             </motion.div>
-          )}
-
-          {!calc.ready && (
-            <motion.div
-              key="placeholder"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <Card className="border-dashed border-border/60">
-                <CardContent className="p-6 flex items-center justify-center gap-3 text-muted-foreground/50">
-                  <Calculator className="w-5 h-5" />
-                  <span className="text-sm">Select all options above to calculate</span>
-                </CardContent>
-              </Card>
+          ) : (
+            <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <div className="flex items-center justify-center gap-2 py-6 text-muted-foreground/40 text-sm border border-dashed border-border/50 rounded-xl">
+                <Calculator className="w-4 h-4" />
+                Select all options to calculate
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* How it works */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
-        >
-          <Card className="border-border/60">
-            <CardContent className="p-6 space-y-3">
-              <h2 className="text-sm font-semibold flex items-center gap-2" style={{ fontFamily: 'Space Grotesk' }}>
-                <Info className="w-4 h-4 text-primary" />
-                How reconstitution math works
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-muted-foreground">
-                <div className="space-y-1">
-                  <p className="font-medium text-foreground">1. Concentration</p>
-                  <p>Vial (mg) ÷ BAC water (ml) = mg/ml</p>
-                  <p className="font-mono bg-secondary/50 rounded px-2 py-1 text-foreground">10 mg ÷ 2 ml = 5 mg/ml</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="font-medium text-foreground">2. Volume needed</p>
-                  <p>Dose (mg) ÷ concentration (mg/ml) = ml</p>
-                  <p className="font-mono bg-secondary/50 rounded px-2 py-1 text-foreground">1 mg ÷ 5 mg/ml = 0.2 ml</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="font-medium text-foreground">3. Syringe units</p>
-                  <p>(Volume ÷ syringe vol) × max units</p>
-                  <p className="font-mono bg-secondary/50 rounded px-2 py-1 text-foreground">(0.2 ÷ 0.5) × 50 = 20u</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+        {/* Disclaimer */}
+        <p className="text-xs text-muted-foreground/60 text-center leading-relaxed">
+          For research purposes only. Not medical advice. Always verify calculations independently.
+        </p>
 
       </div>
     </div>
