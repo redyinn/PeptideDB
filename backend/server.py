@@ -384,7 +384,11 @@ IMPORTANT_PEPTIDES = [
     "Oxytocin", "Insulin", "BPC-157", "TB-500",
     "GHK-Cu", "Ipamorelin", "CJC-1295", "Sermorelin",
     "Melanotan II", "PT-141", "AOD-9604", "Epitalon",
-    "Thymosin Alpha 1", "LL-37", "Kisspeptin", "Retatrutide"
+    "Thymosin Alpha 1", "LL-37", "Kisspeptin", "Retatrutide",
+    "IGF-1 LR3", "MOD-GRF(1-29)", "Teriparatide", "Argireline",
+    "KPV", "SS-31 (Elamipretide)", "Desmopressin", "Leuprolide",
+    "Mechano Growth Factor (MGF)", "Orforglipron", "Pinealon",
+    "Snap-8", "Collagen Peptides", "Bremelanotide", "Palmitoyl Tripeptide-1"
 ]
 
 # ─── FASTAPI APP ─────────────────────────────────────────────
