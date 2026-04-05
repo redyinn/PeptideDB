@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
@@ -139,6 +140,10 @@ export default function HomePage() {
 
   return (
     <div>
+      <Helmet>
+        <title>PeptideDB — Peptide Research Database</title>
+        <meta name="description" content="Explore 48+ peptide therapeutics with clinical trial data, PubMed research papers, dosage information, and mechanisms of action. BPC-157, Semaglutide, Tirzepatide and more." />
+      </Helmet>
       {/* Hero Section — Lamp + Shader Background */}
       <div className="relative">
         <AnimatedShaderBackground />

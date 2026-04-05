@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ExternalLink, Shield, Pill, Activity, AlertTriangle, Beaker, FlaskConical, Copy, Check, Thermometer, Droplets, Clock } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Shield, Pill, Activity, AlertTriangle, Beaker, FlaskConical, Copy, Check, Thermometer, Droplets, Clock, GitCompareArrows } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Skeleton } from '../components/ui/skeleton';
-import { getPeptideDetail, getTrials, getPapers } from '../lib/api';
+import { getPeptideDetail, getTrials, getPapers, getPeptides } from '../lib/api';
 import { toast } from 'sonner';
 
 function copyCitation(paper, lang) {
@@ -86,6 +87,7 @@ export default function PeptideDetailPage() {
   const [peptide, setPeptide] = useState(null);
   const [trials, setTrials] = useState([]);
   const [papers, setPapers] = useState([]);
+  const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
 
@@ -103,6 +105,13 @@ export default function PeptideDetailPage() {
       ]);
       if (trialRes.status === 'fulfilled') setTrials(trialRes.value.data.trials || []);
       if (paperRes.status === 'fulfilled') setPapers(paperRes.value.data.papers || []);
+      // Fetch related peptides from same category
+      if (res.data.category) {
+        try {
+          const relRes = await getPeptides({ category: res.data.category, limit: 4 });
+          setRelated((relRes.data.peptides || []).filter(rp => rp.slug !== slug).slice(0, 3));
+        } catch (_) {}
+      }
     } catch (e) {
       console.error(e);
     }
@@ -151,6 +160,21 @@ export default function PeptideDetailPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <Helmet>
+        <title>{p.name} — PeptideDB</title>
+        <meta name="description" content={`${p.description?.en || ''}`.slice(0, 160)} />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Drug",
+          "name": p.name,
+          "description": p.description?.en || '',
+          "mechanismOfAction": p.mechanism_of_action?.en || '',
+          "activeIngredient": p.name,
+          "administrationRoute": p.dosage?.route_en || '',
+          "url": `https://peptide-db-six.vercel.app/encyclopedia/${slug}`,
+          "manufacturer": p.manufacturer ? { "@type": "Organization", "name": p.manufacturer } : undefined,
+        })}</script>
+      </Helmet>
       {/* Breadcrumb */}
       <motion.div initial="hidden" animate="visible" variants={fadeUp} className="mb-6">
         <Link to="/encyclopedia" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors">
@@ -161,15 +185,24 @@ export default function PeptideDetailPage() {
 
       {/* Header */}
       <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={1} className="mb-8">
-        <div className="flex flex-wrap items-start gap-3 mb-3">
-          <h1 className="text-3xl md:text-4xl font-semibold tracking-tight" style={{ fontFamily: 'Space Grotesk' }}>
-            {p.name}
-          </h1>
-          <div className="flex flex-wrap gap-2 mt-1">
-            <Badge variant="secondary">{p.category || 'Peptide'}</Badge>
-            {p.research_status?.fda_approved && <Badge className="bg-green-100 text-green-700 hover:bg-green-100">FDA</Badge>}
-            {p.research_status?.ema_approved && <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">EMA</Badge>}
+        <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-semibold tracking-tight" style={{ fontFamily: 'Space Grotesk' }}>
+              {p.name}
+            </h1>
+            <div className="flex flex-wrap gap-2 mt-2">
+              <Badge variant="secondary">{p.category || 'Peptide'}</Badge>
+              {p.research_status?.fda_approved && <Badge className="bg-green-500/10 text-green-400 border border-green-500/20">FDA Approved</Badge>}
+              {p.research_status?.ema_approved && <Badge className="bg-blue-500/10 text-blue-400 border border-blue-500/20">EMA Approved</Badge>}
+            </div>
           </div>
+          <Link
+            to={`/encyclopedia/compare?peptides=${slug}`}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-border bg-secondary text-sm font-medium text-muted-foreground hover:text-primary hover:border-primary/40 transition-colors shrink-0"
+          >
+            <GitCompareArrows className="w-4 h-4" />
+            {lang === 'de' ? 'Vergleichen' : 'Compare'}
+          </Link>
         </div>
         <p className="text-base text-muted-foreground max-w-[72ch] leading-7">
           {p.description?.[lang] || p.description?.en || ''}
@@ -508,8 +541,34 @@ export default function PeptideDetailPage() {
         </TabsContent>
       </Tabs>
 
+      {/* Related Peptides */}
+      {related.length > 0 && (
+        <div className="mt-12">
+          <h2 className="text-lg font-semibold mb-4" style={{ fontFamily: 'Space Grotesk' }}>
+            {lang === 'de' ? 'Ähnliche Peptide' : 'Related Peptides'}
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {related.map(rp => (
+              <Link key={rp.slug} to={`/encyclopedia/${rp.slug}`}>
+                <Card className="border border-border/50 hover:border-primary/30 transition-colors h-full">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <h3 className="font-semibold text-sm" style={{ fontFamily: 'Space Grotesk' }}>{rp.name}</h3>
+                      <Badge variant="secondary" className="text-xs shrink-0">{rp.category}</Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                      {rp.description?.[lang] || rp.description?.en || ''}
+                    </p>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Disclaimer */}
-      <div className="mt-12 p-4 rounded-xl bg-secondary/30 border border-border/50">
+      <div className="mt-8 p-4 rounded-xl bg-secondary/30 border border-border/50">
         <p className="text-xs text-muted-foreground">{t('common.disclaimer')}</p>
       </div>
     </div>
