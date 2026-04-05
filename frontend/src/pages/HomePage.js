@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Search, ArrowRight, FlaskConical, BookOpen, TestTube, ExternalLink, TrendingUp } from 'lucide-react';
+import { Search, ArrowRight, Dna, BookOpen, TestTube, ExternalLink, TrendingUp } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { LampContainer } from '../components/ui/lamp';
@@ -203,7 +203,7 @@ export default function HomePage() {
                   onMouseDown={() => { setShowSuggestions(false); navigate(`/encyclopedia/${p.slug}`); }}
                   className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-slate-800 transition-colors text-left"
                 >
-                  <FlaskConical className="w-4 h-4 text-cyan-500 shrink-0" />
+                  <Dna className="w-4 h-4 text-cyan-500 shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-slate-200 truncate">{p.name}</p>
                     <p className="text-xs text-slate-500 truncate">{p.category}</p>
@@ -247,7 +247,7 @@ export default function HomePage() {
           {t('home.live_signals')}
         </p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <StatCard icon={FlaskConical} label={t('home.stats_peptides')} value={stats?.peptides_in_db || 0} loading={loading} />
+          <StatCard icon={Dna} label={t('home.stats_peptides')} value={stats?.peptides_in_db || 0} loading={loading} />
           <StatCard icon={TestTube} label={t('home.stats_trials')} value={trials.length || '...'} loading={loading} />
           <StatCard icon={BookOpen} label={t('home.stats_papers')} value={papers.length || '...'} loading={loading} />
           <StatCard icon={TrendingUp} label={t('home.stats_sources')} value={stats?.data_sources?.length || 3} loading={loading} />
@@ -316,7 +316,7 @@ export default function HomePage() {
           ) : (
             <Card className="col-span-full border border-border/50">
               <CardContent className="p-8 text-center">
-                <FlaskConical className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+                <Dna className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
                 <p className="text-sm text-muted-foreground">{t('encyclopedia.no_results')}</p>
               </CardContent>
             </Card>

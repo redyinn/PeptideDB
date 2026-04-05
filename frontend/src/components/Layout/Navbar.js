@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Search, Globe, FlaskConical, Moon, Sun, Calculator } from 'lucide-react';
+import { Menu, X, Search, Globe, Dna, Moon, Sun, Calculator } from 'lucide-react';
 import { Button } from '../ui/button';
 
 const navItems = [
@@ -56,7 +56,7 @@ export default function Navbar() {
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2.5 group" data-testid="nav-logo">
               <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
-                <FlaskConical className="w-5 h-5 text-primary-foreground" />
+                <Dna className="w-5 h-5 text-primary-foreground" />
               </div>
               <span className="font-semibold text-lg tracking-tight hidden sm:block" style={{ fontFamily: 'Space Grotesk' }}>
                 PeptideDB
