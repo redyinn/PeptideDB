@@ -23,6 +23,17 @@ const fadeUp = {
   visible: (i = 0) => ({ opacity: 1, y: 0, transition: { delay: i * 0.06, duration: 0.45 } })
 };
 
+function getEvidenceBadge(trial) {
+  const phase = (trial.phase || '').toLowerCase();
+  if (phase.includes('phase 3') || phase.includes('phase iii') || phase.includes('phase 4') || phase.includes('phase iv'))
+    return { label: 'Level A', title: 'RCT / Phase 3+', className: 'bg-green-500/10 text-green-400 border border-green-500/20' };
+  if (phase.includes('phase 2') || phase.includes('phase ii'))
+    return { label: 'Level B', title: 'Phase 2', className: 'bg-blue-500/10 text-blue-400 border border-blue-500/20' };
+  if (phase.includes('phase 1') || phase.includes('phase i'))
+    return { label: 'Level C', title: 'Phase 1', className: 'bg-secondary text-muted-foreground border border-border' };
+  return null;
+}
+
 function InfoRow({ label, value, mono = false }) {
   if (!value) return null;
   return (
@@ -295,6 +306,14 @@ export default function PeptideDetailPage() {
 
         {/* Dosage Tab */}
         <TabsContent value="dosage">
+          <div className="mb-5 flex items-start gap-3 p-4 rounded-xl border" style={{ background: 'hsl(38 92% 50% / 0.07)', borderColor: 'hsl(38 92% 50% / 0.25)' }}>
+            <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'hsl(38 92% 60%)' }} />
+            <p className="text-xs leading-relaxed" style={{ color: 'hsl(38 92% 65%)' }}>
+              {lang === 'de'
+                ? 'Die Dosierungsangaben dienen ausschließlich Forschungszwecken und ersetzen keine medizinische Beratung. Konsultiere einen qualifizierten Arzt vor der Anwendung.'
+                : 'Dosage information is for research purposes only and does not constitute medical advice. Consult a qualified healthcare professional before use.'}
+            </p>
+          </div>
           <Card className="border border-border/50">
             <CardContent className="pt-6">
               {p.dosage ? (
@@ -411,6 +430,14 @@ export default function PeptideDetailPage() {
                       {trial.status?.replace(/_/g, ' ')}
                     </span>
                     {trial.phase !== 'N/A' && <Badge variant="outline" className="text-xs">{trial.phase}</Badge>}
+                    {(() => {
+                      const ev = getEvidenceBadge(trial);
+                      return ev ? (
+                        <span title={ev.title} className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium font-mono ${ev.className}`}>
+                          {ev.label}
+                        </span>
+                      ) : null;
+                    })()}
                     {trial.sponsor && <span className="text-xs text-muted-foreground">{trial.sponsor}</span>}
                   </div>
                   {trial.conditions?.length > 0 && (

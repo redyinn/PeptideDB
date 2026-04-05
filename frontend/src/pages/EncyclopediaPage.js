@@ -16,6 +16,23 @@ const fadeUp = {
   visible: (i = 0) => ({ opacity: 1, y: 0, transition: { delay: i * 0.06, duration: 0.45 } })
 };
 
+function getPhaseBadge(researchStatus) {
+  if (!researchStatus) return null;
+  const { fda_approved, ema_approved, phase } = researchStatus;
+  const ph = (phase || '').toLowerCase();
+  if (fda_approved) return { label: 'FDA Approved', className: 'bg-primary/15 text-primary border border-primary/25' };
+  if (ema_approved) return { label: 'EMA Approved', className: 'bg-primary/15 text-primary border border-primary/25' };
+  if (ph.includes('phase 3') || ph.includes('phase iii') || ph.includes('phase 4') || ph.includes('phase iv'))
+    return { label: phase, className: 'bg-green-500/10 text-green-400 border border-green-500/20' };
+  if (ph.includes('phase 2') || ph.includes('phase ii'))
+    return { label: phase, className: 'bg-amber-500/10 text-amber-400 border border-amber-500/20' };
+  if (ph.includes('phase 1') || ph.includes('phase i'))
+    return { label: phase, className: 'bg-orange-500/10 text-orange-400 border border-orange-500/20' };
+  if (ph.includes('preclinical'))
+    return { label: phase, className: 'bg-purple-500/10 text-purple-400 border border-purple-500/20' };
+  return { label: phase || 'Research', className: 'bg-secondary text-muted-foreground border border-border' };
+}
+
 function getFreshness(dateStr) {
   if (!dateStr) return null;
   const d = new Date(dateStr);
@@ -189,16 +206,19 @@ export default function EncyclopediaPage() {
                       <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
                         {p.description?.[lang] || p.description?.en || ''}
                       </p>
-                      {p.research_status && (
-                        <div className="mt-3 flex flex-wrap items-center gap-2">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${p.research_status?.fda_approved ? 'status-completed' : 'status-active'}`}>
-                            {p.research_status?.phase || 'Research'}
-                          </span>
-                          {p.manufacturer && (
-                            <span className="text-xs text-muted-foreground">{p.manufacturer}</span>
-                          )}
-                        </div>
-                      )}
+                      {p.research_status && (() => {
+                        const badge = getPhaseBadge(p.research_status);
+                        return badge ? (
+                          <div className="mt-3 flex flex-wrap items-center gap-2">
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium font-mono tracking-wide ${badge.className}`}>
+                              {badge.label}
+                            </span>
+                            {p.manufacturer && (
+                              <span className="text-xs text-muted-foreground">{p.manufacturer}</span>
+                            )}
+                          </div>
+                        ) : null;
+                      })()}
                       {p.updated_at && (() => {
                         const freshness = getFreshness(p.updated_at);
                         return (
