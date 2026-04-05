@@ -395,6 +395,22 @@ IMPORTANT_PEPTIDES = [
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Peptide Research Platform starting...")
+    # Auto-sync peptides_export.json → MongoDB on startup
+    if peptides_col is not None:
+        try:
+            export_path = _os.path.join(_os.path.dirname(__file__), "peptides_export.json")
+            if _os.path.exists(export_path):
+                with open(export_path, encoding="utf-8") as f:
+                    exported = _json.load(f)
+                existing_slugs = {d["slug"] for d in peptides_col.find({}, {"slug": 1})}
+                new_docs = [p for p in exported if p.get("slug") not in existing_slugs]
+                if new_docs:
+                    peptides_col.insert_many(new_docs)
+                    logger.info(f"Auto-synced {len(new_docs)} new peptides from peptides_export.json")
+                else:
+                    logger.info("peptides_export.json: no new peptides to sync")
+        except Exception as e:
+            logger.error(f"Auto-sync error: {e}")
     yield
     logger.info("Shutting down...")
 
