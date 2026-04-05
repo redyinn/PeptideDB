@@ -14,6 +14,7 @@ const PapersPage = React.lazy(() => import('./pages/PapersPage'));
 const NewsPage = React.lazy(() => import('./pages/NewsPage'));
 const ComparePage = React.lazy(() => import('./pages/ComparePage'));
 const GlossaryPage = React.lazy(() => import('./pages/GlossaryPage'));
+const DosageCalculatorPage = React.lazy(() => import('./pages/DosageCalculatorPage'));
 const NotFoundPage = React.lazy(() => import('./pages/NotFoundPage'));
 
 function LoadingFallback() {
@@ -43,6 +44,7 @@ function App() {
               <Route path="/papers" element={<PapersPage />} />
               <Route path="/news" element={<NewsPage />} />
               <Route path="/glossary" element={<GlossaryPage />} />
+              <Route path="/calculator" element={<DosageCalculatorPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </Suspense>

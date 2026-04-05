@@ -11,6 +11,7 @@ const navItems = [
   { key: 'papers', path: '/papers' },
   { key: 'news', path: '/news' },
   { key: 'glossary', path: '/glossary' },
+  { key: 'calculator', path: '/calculator' },
 ];
 
 export default function Navbar() {

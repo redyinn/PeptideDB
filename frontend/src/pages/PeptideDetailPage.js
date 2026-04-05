@@ -371,13 +371,18 @@ export default function PeptideDetailPage() {
 
         {/* Dosage Tab */}
         <TabsContent value="dosage">
-          <div className="mb-5 flex items-start gap-3 p-4 rounded-xl border" style={{ background: 'hsl(38 92% 50% / 0.07)', borderColor: 'hsl(38 92% 50% / 0.25)' }}>
-            <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'hsl(38 92% 60%)' }} />
-            <p className="text-xs leading-relaxed" style={{ color: 'hsl(38 92% 65%)' }}>
-              {lang === 'de'
-                ? 'Die Dosierungsangaben dienen ausschließlich Forschungszwecken und ersetzen keine medizinische Beratung. Konsultiere einen qualifizierten Arzt vor der Anwendung.'
-                : 'Dosage information is for research purposes only and does not constitute medical advice. Consult a qualified healthcare professional before use.'}
-            </p>
+          <div className="mb-5 flex items-start justify-between gap-3 p-4 rounded-xl border flex-wrap" style={{ background: 'hsl(38 92% 50% / 0.07)', borderColor: 'hsl(38 92% 50% / 0.25)' }}>
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'hsl(38 92% 60%)' }} />
+              <p className="text-xs leading-relaxed" style={{ color: 'hsl(38 92% 65%)' }}>
+                {lang === 'de'
+                  ? 'Die Dosierungsangaben dienen ausschließlich Forschungszwecken und ersetzen keine medizinische Beratung. Konsultiere einen qualifizierten Arzt vor der Anwendung.'
+                  : 'Dosage information is for research purposes only and does not constitute medical advice. Consult a qualified healthcare professional before use.'}
+              </p>
+            </div>
+            <Link to="/calculator" className="shrink-0 text-xs font-medium px-3 py-1.5 rounded-lg border bg-secondary/60 text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors">
+              ⚗ {lang === 'de' ? 'Dosierungsrechner' : 'Dosage Calculator'}
+            </Link>
           </div>
           <Card className="border border-border/50">
             <CardContent className="pt-6">
