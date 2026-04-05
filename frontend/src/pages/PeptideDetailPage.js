@@ -286,6 +286,32 @@ export default function PeptideDetailPage() {
                   <CardTitle className="text-lg">{t('detail.research_status')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-0">
+                  {/* Phase Progress Bar */}
+                  {p.research_status?.phase && (() => {
+                    const ph = (p.research_status.phase || '').toLowerCase();
+                    const approved = p.research_status.fda_approved || p.research_status.ema_approved;
+                    const steps = ['Preclinical', 'Phase 1', 'Phase 2', 'Phase 3', 'Approved'];
+                    let activeIdx = 0;
+                    if (approved) activeIdx = 4;
+                    else if (ph.includes('phase 3') || ph.includes('phase iii')) activeIdx = 3;
+                    else if (ph.includes('phase 2') || ph.includes('phase ii')) activeIdx = 2;
+                    else if (ph.includes('phase 1') || ph.includes('phase i')) activeIdx = 1;
+                    return (
+                      <div className="mb-4 pb-4 border-b border-border/50">
+                        <p className="text-xs text-muted-foreground mb-2">{lang === 'de' ? 'Forschungsphase' : 'Research Phase'}</p>
+                        <div className="flex items-center gap-1">
+                          {steps.map((s, i) => (
+                            <React.Fragment key={s}>
+                              <div className={`flex flex-col items-center gap-1 flex-1`}>
+                                <div className={`w-full h-1.5 rounded-full ${i <= activeIdx ? 'bg-primary' : 'bg-secondary'}`} />
+                                <span className={`text-[9px] font-medium text-center leading-tight ${i <= activeIdx ? 'text-primary' : 'text-muted-foreground/50'}`}>{s}</span>
+                              </div>
+                            </React.Fragment>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()}
                   <InfoRow label={t('detail.manufacturer')} value={p.manufacturer} />
                   <InfoRow label="Phase" value={p.research_status?.phase} />
                   <InfoRow label={t('detail.fda_approved')} value={p.research_status?.fda_approved ? t('common.yes') : t('common.no')} />

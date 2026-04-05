@@ -285,7 +285,7 @@ export default function HomePage() {
                 </Button>
               </motion.div>
             </div>
-            <div className="flex-1 relative">
+            <div className="flex-1 relative hidden md:block">
               <SplineScene
                 scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
                 className="w-full h-full"
