@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
@@ -50,7 +50,7 @@ export default function PapersPage() {
       </Helmet>
       {/* Header */}
       <motion.div initial="hidden" animate="visible" variants={fadeUp} className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-semibold tracking-tight" style={{ fontFamily: 'Space Grotesk' }}>
+        <h1 className="text-3xl md:text-4xl font-semibold tracking-tight" style={{ fontFamily: 'var(--pdb-font-display)' }}>
           {t('papers.title')}
         </h1>
         <p className="mt-2 text-base text-muted-foreground max-w-[64ch]">
@@ -149,3 +149,4 @@ export default function PapersPage() {
     </div>
   );
 }
+

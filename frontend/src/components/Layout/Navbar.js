@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Menu, X, Moon, Sun, Globe, Calculator } from 'lucide-react';
+import { Menu, X, Moon, Sun, Globe, Calculator, Search } from 'lucide-react';
 
 const navItems = [
   { key: 'encyclopedia', path: '/encyclopedia' },
@@ -15,6 +15,7 @@ const navItems = [
 export default function Navbar() {
   const { t, i18n } = useTranslation();
   const location = useLocation();
+  const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dark, setDark] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -30,6 +31,17 @@ export default function Navbar() {
     dark ? root.classList.add('dark') : root.classList.remove('dark');
     localStorage.setItem('peptide-theme', dark ? 'dark' : 'light');
   }, [dark]);
+
+  useEffect(() => {
+    const handler = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        navigate('/encyclopedia');
+      }
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [navigate]);
 
   const isActive = (path) =>
     path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
@@ -76,6 +88,25 @@ export default function Navbar() {
           </nav>
 
           <div style={{ flex: 1 }} />
+
+          {/* Search trigger */}
+          <button
+            onClick={() => navigate('/encyclopedia')}
+            className="hidden md:flex"
+            style={{
+              alignItems: 'center', gap: 8,
+              padding: '7px 12px', border: '1px solid oklch(80% 0.008 145)', borderRadius: 6,
+              background: '#fff', color: 'var(--pdb-ink-3)', fontSize: 13,
+              fontFamily: 'var(--pdb-font-body)', cursor: 'pointer', minWidth: 200,
+              transition: 'border-color 120ms',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--pdb-accent)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'oklch(80% 0.008 145)'; }}
+          >
+            <Search style={{ width: 13, height: 13, flexShrink: 0 }} />
+            <span style={{ flex: 1, textAlign: 'left' }}>Search peptides…</span>
+            <span style={{ fontFamily: 'var(--pdb-font-mono)', fontSize: 11, padding: '1px 5px', border: '1px solid oklch(92% 0.005 145)', borderRadius: 3, color: 'var(--pdb-ink-4)' }}>⌘K</span>
+          </button>
 
           {/* Actions */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>

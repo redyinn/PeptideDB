@@ -21,17 +21,22 @@ function getPhaseBadge(researchStatus) {
   if (!researchStatus) return null;
   const { fda_approved, ema_approved, phase } = researchStatus;
   const ph = (phase || '').toLowerCase();
-  if (fda_approved) return { label: 'FDA Approved', className: 'bg-primary/15 text-primary border border-primary/25' };
-  if (ema_approved) return { label: 'EMA Approved', className: 'bg-primary/15 text-primary border border-primary/25' };
+  const approved = { background: 'var(--pdb-accent-tint)', color: 'var(--pdb-accent-2)', border: '1px solid var(--pdb-accent-tint-2)' };
+  const ph3 = { background: 'var(--pdb-accent-tint)', color: 'var(--pdb-accent)', border: '1px solid var(--pdb-accent-tint-2)' };
+  const ph2 = { background: 'var(--pdb-citation-tint)', color: 'var(--pdb-citation)', border: '1px solid #C5D2E8' };
+  const ph1 = { background: 'var(--pdb-clay-tint)', color: 'var(--pdb-clay)', border: '1px solid #E8C4B5' };
+  const other = { background: 'var(--pdb-page-warm)', color: 'var(--pdb-ink-3)', border: '1px solid oklch(92% 0.005 145)' };
+  if (fda_approved) return { label: 'FDA Approved', style: approved };
+  if (ema_approved) return { label: 'EMA Approved', style: approved };
   if (ph.includes('phase 3') || ph.includes('phase iii') || ph.includes('phase 4') || ph.includes('phase iv'))
-    return { label: phase, className: 'bg-green-500/10 text-green-400 border border-green-500/20' };
+    return { label: phase, style: ph3 };
   if (ph.includes('phase 2') || ph.includes('phase ii'))
-    return { label: phase, className: 'bg-amber-500/10 text-amber-400 border border-amber-500/20' };
+    return { label: phase, style: ph2 };
   if (ph.includes('phase 1') || ph.includes('phase i'))
-    return { label: phase, className: 'bg-orange-500/10 text-orange-400 border border-orange-500/20' };
+    return { label: phase, style: ph1 };
   if (ph.includes('preclinical'))
-    return { label: phase, className: 'bg-purple-500/10 text-purple-400 border border-purple-500/20' };
-  return { label: phase || 'Research', className: 'bg-secondary text-muted-foreground border border-border' };
+    return { label: phase, style: other };
+  return { label: phase || 'Research', style: other };
 }
 
 function getFreshness(dateStr) {
@@ -117,7 +122,7 @@ export default function EncyclopediaPage() {
       </Helmet>
       {/* Header */}
       <motion.div initial="hidden" animate="visible" variants={fadeUp} className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-semibold tracking-tight" style={{ fontFamily: 'Space Grotesk' }}>
+        <h1 className="text-3xl md:text-4xl font-semibold tracking-tight" style={{ fontFamily: 'var(--pdb-font-display)', letterSpacing: '-0.02em' }}>
           {t('encyclopedia.title')}
         </h1>
         <p className="mt-2 text-base text-muted-foreground max-w-[64ch]">
@@ -205,7 +210,7 @@ export default function EncyclopediaPage() {
                   <Link to={`/encyclopedia/${p.slug}`}>
                     <CardContent className="p-5 pb-12">
                       <div className="flex items-start justify-between mb-2">
-                        <h3 className="font-semibold text-base" style={{ fontFamily: 'Space Grotesk' }}>{p.name}</h3>
+                        <h3 className="font-semibold text-base" style={{ fontFamily: 'var(--pdb-font-display)', fontWeight: 500, letterSpacing: '-0.01em' }}>{p.name}</h3>
                         <Badge variant="secondary" className="text-xs shrink-0 ml-2">{p.category || 'Peptide'}</Badge>
                       </div>
                       <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
@@ -215,7 +220,7 @@ export default function EncyclopediaPage() {
                         const badge = getPhaseBadge(p.research_status);
                         return badge ? (
                           <div className="mt-3 flex flex-wrap items-center gap-2">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium font-mono tracking-wide ${badge.className}`}>
+                            <span style={{ ...badge.style, display: 'inline-flex', alignItems: 'center', padding: '3px 8px', borderRadius: 4, fontSize: 11, fontWeight: 500, fontFamily: 'var(--pdb-font-mono)', letterSpacing: '0.04em' }}>
                               {badge.label}
                             </span>
                             {p.manufacturer && (

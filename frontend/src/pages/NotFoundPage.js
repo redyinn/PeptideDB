@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -18,8 +18,8 @@ export default function NotFoundPage() {
         className="text-center max-w-md"
       >
         <FlaskConical className="w-16 h-16 text-muted-foreground mx-auto mb-6 opacity-40" />
-        <h1 className="text-5xl font-bold mb-3 text-muted-foreground/30" style={{ fontFamily: 'Space Grotesk' }}>404</h1>
-        <h2 className="text-xl font-semibold mb-2" style={{ fontFamily: 'Space Grotesk' }}>Page not found</h2>
+        <h1 className="text-5xl font-bold mb-3 text-muted-foreground/30" style={{ fontFamily: 'var(--pdb-font-display)' }}>404</h1>
+        <h2 className="text-xl font-semibold mb-2" style={{ fontFamily: 'var(--pdb-font-display)' }}>Page not found</h2>
         <p className="text-sm text-muted-foreground mb-8 leading-relaxed">
           The compound you're looking for doesn't exist in our database — or the URL may have changed.
         </p>
@@ -41,3 +41,4 @@ export default function NotFoundPage() {
     </div>
   );
 }
+

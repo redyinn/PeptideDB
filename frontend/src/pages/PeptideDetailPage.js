@@ -27,11 +27,11 @@ const fadeUp = {
 function getEvidenceBadge(trial) {
   const phase = (trial.phase || '').toLowerCase();
   if (phase.includes('phase 3') || phase.includes('phase iii') || phase.includes('phase 4') || phase.includes('phase iv'))
-    return { label: 'Level A', title: 'RCT / Phase 3+', className: 'bg-green-500/10 text-green-400 border border-green-500/20' };
+    return { label: 'Level A', title: 'RCT / Phase 3+', style: { background: 'var(--pdb-accent-tint)', color: 'var(--pdb-accent)', border: '1px solid var(--pdb-accent-tint-2)' } };
   if (phase.includes('phase 2') || phase.includes('phase ii'))
-    return { label: 'Level B', title: 'Phase 2', className: 'bg-blue-500/10 text-blue-400 border border-blue-500/20' };
+    return { label: 'Level B', title: 'Phase 2', style: { background: 'var(--pdb-citation-tint)', color: 'var(--pdb-citation)', border: '1px solid #C5D2E8' } };
   if (phase.includes('phase 1') || phase.includes('phase i'))
-    return { label: 'Level C', title: 'Phase 1', className: 'bg-secondary text-muted-foreground border border-border' };
+    return { label: 'Level C', title: 'Phase 1', style: { background: 'var(--pdb-page-warm)', color: 'var(--pdb-ink-3)', border: '1px solid oklch(92% 0.005 145)' } };
   return null;
 }
 
@@ -187,7 +187,7 @@ export default function PeptideDetailPage() {
       <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={1} className="mb-8">
         <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
           <div>
-            <h1 className="text-3xl md:text-4xl font-semibold tracking-tight" style={{ fontFamily: 'Space Grotesk' }}>
+            <h1 className="text-3xl md:text-4xl font-semibold tracking-tight" style={{ fontFamily: 'var(--pdb-font-display)' }}>
               {p.name}
             </h1>
             <div className="flex flex-wrap gap-2 mt-2">
@@ -503,7 +503,7 @@ export default function PeptideDetailPage() {
                     {(() => {
                       const ev = getEvidenceBadge(trial);
                       return ev ? (
-                        <span title={ev.title} className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium font-mono ${ev.className}`}>
+                        <span title={ev.title} style={{ ...ev.style, display: 'inline-flex', alignItems: 'center', padding: '3px 8px', borderRadius: 4, fontSize: 11, fontWeight: 500, fontFamily: 'var(--pdb-font-mono)', letterSpacing: '0.04em' }}>
                           {ev.label}
                         </span>
                       ) : null;
@@ -581,7 +581,7 @@ export default function PeptideDetailPage() {
       {/* Related Peptides */}
       {related.length > 0 && (
         <div className="mt-12">
-          <h2 className="text-lg font-semibold mb-4" style={{ fontFamily: 'Space Grotesk' }}>
+          <h2 className="text-lg font-semibold mb-4" style={{ fontFamily: 'var(--pdb-font-display)' }}>
             {lang === 'de' ? 'Ähnliche Peptide' : 'Related Peptides'}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -590,7 +590,7 @@ export default function PeptideDetailPage() {
                 <Card className="border border-border/50 hover:border-primary/30 transition-colors h-full">
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between gap-2 mb-2">
-                      <h3 className="font-semibold text-sm" style={{ fontFamily: 'Space Grotesk' }}>{rp.name}</h3>
+                      <h3 className="font-semibold text-sm" style={{ fontFamily: 'var(--pdb-font-display)' }}>{rp.name}</h3>
                       <Badge variant="secondary" className="text-xs shrink-0">{rp.category}</Badge>
                     </div>
                     <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">

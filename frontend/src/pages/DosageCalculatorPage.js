@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+﻿import React, { useState, useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calculator, AlertTriangle, CheckCircle2, Syringe } from 'lucide-react';
@@ -158,7 +158,7 @@ export default function DosageCalculatorPage() {
             <Calculator className="w-4 h-4 text-primary" />
           </div>
           <div>
-            <h1 className="text-xl font-bold" style={{ fontFamily: 'Space Grotesk' }}>Dosage Calculator</h1>
+            <h1 className="text-xl font-bold" style={{ fontFamily: 'var(--pdb-font-display)' }}>Dosage Calculator</h1>
             <p className="text-xs text-muted-foreground">Peptide reconstitution · syringe units</p>
           </div>
         </div>
@@ -189,7 +189,7 @@ export default function DosageCalculatorPage() {
                       <div className="flex items-baseline gap-1.5">
                         <span
                           className={`text-5xl font-bold tabular-nums ${r.fits ? 'text-primary' : 'text-destructive'}`}
-                          style={{ fontFamily: 'Space Grotesk' }}
+                          style={{ fontFamily: 'var(--pdb-font-display)' }}
                         >
                           {r.fits ? r.units : '—'}
                         </span>
@@ -242,3 +242,4 @@ export default function DosageCalculatorPage() {
     </div>
   );
 }
+

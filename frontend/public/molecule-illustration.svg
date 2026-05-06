@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none" stroke="#2F7D6B" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+
+  <g opacity="0.9">
+    <path d="M40 80 Q 200 40, 360 80 T 360 140 Q 200 100, 40 140 T 40 200 Q 200 160, 360 200 T 360 260 Q 200 220, 40 260 T 40 320"></path>
+  </g>
+  <g opacity="0.5">
+    <path d="M40 80 V 320" stroke-dasharray="3 6"></path>
+    <path d="M360 80 V 320" stroke-dasharray="3 6"></path>
+  </g>
+  <g fill="#2F7D6B" stroke="none">
+    <circle cx="40" cy="80" r="3"></circle>
+    <circle cx="360" cy="80" r="3"></circle>
+    <circle cx="360" cy="140" r="3"></circle>
+    <circle cx="40" cy="140" r="3"></circle>
+    <circle cx="40" cy="200" r="3"></circle>
+    <circle cx="360" cy="200" r="3"></circle>
+    <circle cx="360" cy="260" r="3"></circle>
+    <circle cx="40" cy="260" r="3"></circle>
+    <circle cx="40" cy="320" r="3"></circle>
+  </g>
+
+  <g opacity="0.35">
+    <path d="M120 70 L 120 50 L 110 42"></path>
+    <path d="M200 95 L 200 75"></path>
+    <path d="M280 70 L 280 50 L 290 42"></path>
+    <path d="M120 270 L 120 290 L 130 298"></path>
+    <path d="M200 295 L 200 315"></path>
+    <path d="M280 270 L 280 290 L 270 298"></path>
+  </g>
+</svg>

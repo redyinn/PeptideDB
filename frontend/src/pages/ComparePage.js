@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
@@ -112,7 +112,7 @@ export default function ComparePage() {
 
       {/* Header */}
       <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={1} className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-semibold tracking-tight" style={{ fontFamily: 'Space Grotesk' }}>
+        <h1 className="text-3xl md:text-4xl font-semibold tracking-tight" style={{ fontFamily: 'var(--pdb-font-display)' }}>
           {t('detail.compare_peptides')}
         </h1>
         <p className="mt-2 text-base text-muted-foreground">{t('detail.select_peptides')}</p>
@@ -188,7 +188,7 @@ export default function ComparePage() {
                 <span className="text-sm font-semibold text-muted-foreground">{t('detail.property')}</span>
                 {peptides.map(p => (
                   <Link key={p.slug} to={`/encyclopedia/${p.slug}`} className="hover:text-primary transition-colors">
-                    <span className="text-sm font-semibold" style={{ fontFamily: 'Space Grotesk' }}>{p.name}</span>
+                    <span className="text-sm font-semibold" style={{ fontFamily: 'var(--pdb-font-display)' }}>{p.name}</span>
                   </Link>
                 ))}
               </div>
@@ -241,3 +241,4 @@ export default function ComparePage() {
     </div>
   );
 }
+

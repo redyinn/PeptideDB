@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
@@ -69,7 +69,7 @@ export default function GlossaryPage() {
       </Helmet>
       {/* Header */}
       <motion.div initial="hidden" animate="visible" variants={fadeUp} className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-semibold tracking-tight" style={{ fontFamily: 'Space Grotesk' }}>
+        <h1 className="text-3xl md:text-4xl font-semibold tracking-tight" style={{ fontFamily: 'var(--pdb-font-display)' }}>
           {t('glossary.title')}
         </h1>
         <p className="mt-2 text-base text-muted-foreground max-w-[64ch]">
@@ -108,7 +108,7 @@ export default function GlossaryPage() {
       <div className="space-y-8">
         {letters.map(letter => (
           <motion.div key={letter} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-            <h2 id={`glossary-${letter}`} className="text-2xl font-semibold text-primary mb-4 scroll-mt-20" style={{ fontFamily: 'Space Grotesk' }}>
+            <h2 id={`glossary-${letter}`} className="text-2xl font-semibold text-primary mb-4 scroll-mt-20" style={{ fontFamily: 'var(--pdb-font-display)' }}>
               {letter}
             </h2>
             <div className="space-y-3">
@@ -118,7 +118,7 @@ export default function GlossaryPage() {
                     <div className="flex items-start gap-3">
                       <BookOpen className="w-4 h-4 text-primary mt-1 shrink-0" />
                       <div>
-                        <h3 className="font-semibold text-sm" style={{ fontFamily: 'Space Grotesk' }}>
+                        <h3 className="font-semibold text-sm" style={{ fontFamily: 'var(--pdb-font-display)' }}>
                           {lang === 'de' ? term.term_de : term.term_en}
                           {lang === 'de' && term.term_en !== term.term_de && (
                             <span className="text-muted-foreground font-normal ml-2">({term.term_en})</span>
@@ -148,3 +148,4 @@ export default function GlossaryPage() {
     </div>
   );
 }
+
