@@ -1,130 +1,101 @@
-/* Glass surface utility */
+/* Navbar glass surface — ivory themed */
 .glass-surface {
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(250, 247, 242, 0.78);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(15, 118, 110, 0.14);
-  box-shadow: 0 1px 2px rgba(2, 6, 23, 0.06);
+  border-bottom: 1px solid oklch(92% 0.005 145);
+  box-shadow: 0 1px 0 oklch(20% 0.01 145 / 0.04);
 }
 .dark .glass-surface {
-  background: rgba(15, 23, 42, 0.78);
-  border: 1px solid rgba(45, 212, 191, 0.12);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-}
-
-/* Noise overlay */
-.noise::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/></filter><rect width='120' height='120' filter='url(%23n)' opacity='0.35'/></svg>");
-  opacity: 0.06;
-  pointer-events: none;
-  mix-blend-mode: multiply;
-}
-
-/* Hero gradient background */
-.hero-gradient {
-  background:
-    radial-gradient(900px circle at 20% 10%, rgba(153, 246, 228, 0.45), transparent 55%),
-    radial-gradient(700px circle at 80% 0%, rgba(37, 99, 235, 0.08), transparent 60%),
-    linear-gradient(180deg, rgba(247, 250, 252, 0.0), rgba(247, 250, 252, 1));
-}
-.dark .hero-gradient {
-  background:
-    radial-gradient(900px circle at 20% 10%, rgba(45, 212, 191, 0.15), transparent 55%),
-    radial-gradient(700px circle at 80% 0%, rgba(37, 99, 235, 0.06), transparent 60%),
-    linear-gradient(180deg, rgba(11, 18, 32, 0.0), rgba(11, 18, 32, 1));
+  background: rgba(14, 20, 17, 0.82);
+  border-bottom: 1px solid oklch(25% 0.008 145);
 }
 
 /* Premium card hover */
 .card-hover {
-  transition: box-shadow 0.2s ease, transform 0.15s ease;
+  transition: border-color 200ms cubic-bezier(0.32, 0.72, 0, 1),
+              transform 200ms cubic-bezier(0.32, 0.72, 0, 1),
+              box-shadow 200ms cubic-bezier(0.32, 0.72, 0, 1);
 }
 .card-hover:hover {
-  box-shadow: 0 12px 30px rgba(2, 6, 23, 0.10);
+  border-color: oklch(80% 0.008 145) !important;
   transform: translateY(-2px);
+  box-shadow: 0 1px 0 oklch(20% 0.01 145 / 0.04), 0 8px 16px -6px oklch(20% 0.01 145 / 0.10);
 }
 
 /* Status badges */
 .status-recruiting {
-  background-color: rgba(22, 163, 74, 0.1);
-  color: #16a34a;
+  background-color: rgba(47, 125, 107, 0.1);
+  color: #2F7D6B;
 }
 .status-completed {
-  background-color: rgba(37, 99, 235, 0.1);
-  color: #2563eb;
+  background-color: rgba(60, 90, 138, 0.1);
+  color: #3C5A8A;
 }
 .status-active {
-  background-color: rgba(217, 119, 6, 0.1);
-  color: #d97706;
+  background-color: rgba(184, 84, 58, 0.1);
+  color: #B8543A;
 }
 .status-default {
-  background-color: rgba(100, 116, 139, 0.1);
-  color: #64748b;
+  background-color: rgba(107, 118, 112, 0.1);
+  color: #6B7670;
 }
 
-/* Tabular numbers for data */
-.tabular-nums {
-  font-variant-numeric: tabular-nums;
+/* PDB hero animations */
+@keyframes pdb-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-
-/* Skeleton pulse */
+@keyframes pdb-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes pdb-float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-10px); }
+}
+@keyframes pdb-glow-pulse {
+  0%, 100% { opacity: .55; transform: scale(1); }
+  50%       { opacity: .9;  transform: scale(1.05); }
+}
+@keyframes pdb-stat-tick {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pdb-card-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 @keyframes skeleton-pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
-.skeleton-pulse {
-  animation: skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  50%       { opacity: 0.4; }
 }
 
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
+.pdb-rise       { animation: pdb-rise 700ms cubic-bezier(0.32,0.72,0,1) both; }
+.pdb-fade       { animation: pdb-fade 900ms cubic-bezier(0.32,0.72,0,1) both; }
+.pdb-mol        { animation: pdb-float 9s ease-in-out infinite; }
+.pdb-glow       { animation: pdb-glow-pulse 6s ease-in-out infinite; transform-origin: center; }
+.pdb-stat       { animation: pdb-stat-tick 600ms cubic-bezier(0.32,0.72,0,1) both; }
+.pdb-card-in    { animation: pdb-card-in 500ms cubic-bezier(0.32,0.72,0,1) both; }
+.skeleton-pulse { animation: skeleton-pulse 2s cubic-bezier(0.4,0,0.6,1) infinite; }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: hsl(210, 40%, 98%);
-}
-::-webkit-scrollbar-thumb {
-  background: hsl(214, 32%, 81%);
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(215, 16%, 55%);
-}
-.dark ::-webkit-scrollbar-track {
-  background: hsl(222, 47%, 6%);
-}
-.dark ::-webkit-scrollbar-thumb {
-  background: hsl(222, 20%, 22%);
-}
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: hsl(222, 20%, 30%);
-}
+/* Button press */
+.btn-press:active { transform: scale(0.98); }
 
-/* Button press effect */
-.btn-press:active {
-  transform: scale(0.98);
-}
+/* Tabular numbers */
+.tabular-nums { font-variant-numeric: tabular-nums; }
 
-/* Particle container */
-.particles-container {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-}
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--pdb-page-warm, #F4EFE7); }
+::-webkit-scrollbar-thumb { background: oklch(80% 0.008 145); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: oklch(70% 0.012 145); }
+.dark ::-webkit-scrollbar-track { background: #0E1411; }
+.dark ::-webkit-scrollbar-thumb { background: oklch(28% 0.01 145); }
+
+html { scroll-behavior: smooth; }
 
 @media (prefers-reduced-motion: reduce) {
-  .particles-container {
-    display: none;
-  }
-  .card-hover:hover {
-    transform: none;
-  }
+  .pdb-rise, .pdb-fade, .pdb-mol, .pdb-glow, .pdb-stat, .pdb-card-in { animation: none !important; }
+  .card-hover:hover { transform: none; }
 }

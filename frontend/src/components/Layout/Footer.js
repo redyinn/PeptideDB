@@ -1,28 +1,54 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlaskConical } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+function FooterCol({ heading, items }) {
+  return (
+    <div>
+      <div className="pdb-overline" style={{ marginBottom: 12 }}>{heading}</div>
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {items.map(({ label, to, href }) => (
+          <li key={label}>
+            {to ? (
+              <Link to={to} style={{ fontSize: 13, color: 'var(--pdb-ink-2)', textDecoration: 'none' }}>{label}</Link>
+            ) : (
+              <a href={href || '#'} style={{ fontSize: 13, color: 'var(--pdb-ink-2)', textDecoration: 'none' }}>{label}</a>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 export default function Footer() {
   const { t } = useTranslation();
 
   return (
-    <footer className="border-t border-border bg-white mt-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <FlaskConical className="w-4 h-4 text-primary-foreground" />
-            </div>
-            <span className="font-semibold text-sm" style={{ fontFamily: 'Space Grotesk' }}>
-              PeptideDB
-            </span>
-          </div>
+    <footer style={{ borderTop: '1px solid oklch(92% 0.005 145)', marginTop: 64, padding: '40px 24px 56px', background: 'var(--pdb-page-warm)' }}>
+      <div style={{ maxWidth: 1280, margin: '0 auto', display: 'flex', justifyContent: 'space-between', gap: 32, flexWrap: 'wrap' }}>
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 text-xs text-muted-foreground">
-            <span>{t('footer.data_sources')}: ClinicalTrials.gov, PubMed, OpenAI</span>
-            <span className="hidden sm:block">|</span>
-            <span>{t('footer.disclaimer')}</span>
+        <div style={{ maxWidth: 340 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+            <img src="/logo-mark.svg" width="22" height="22" alt="" />
+            <span style={{ fontFamily: 'var(--pdb-font-display)', fontSize: 17, fontWeight: 500, color: 'var(--pdb-ink)' }}>PeptideDB</span>
           </div>
+          <p style={{ fontSize: 13, color: 'var(--pdb-ink-3)', margin: 0, lineHeight: 1.65 }}>
+            {t('footer.disclaimer')} {t('footer.data_sources')}: ClinicalTrials.gov, PubMed.
+          </p>
+        </div>
+
+        <div style={{ display: 'flex', gap: 48, flexWrap: 'wrap' }}>
+          <FooterCol heading="Product" items={[
+            { label: t('nav.encyclopedia'), to: '/encyclopedia' },
+            { label: t('nav.studies'),      to: '/studies' },
+            { label: t('nav.papers'),       to: '/papers' },
+            { label: 'Calculator',          to: '/calculator' },
+          ]} />
+          <FooterCol heading="Resources" items={[
+            { label: t('nav.glossary'), to: '/glossary' },
+            { label: t('nav.news'),     to: '/news' },
+          ]} />
         </div>
       </div>
     </footer>

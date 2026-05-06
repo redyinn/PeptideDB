@@ -2,62 +2,96 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 222 47% 11%;
+    /* shadcn HSL tokens — mapped to PeptideDB ivory palette */
+    --background: 38 44% 97%;           /* #FAF7F2 ivory */
+    --foreground: 145 8% 11%;           /* #1A1F1C ink */
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 145 8% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 173 78% 26%;
+    --popover-foreground: 145 8% 11%;
+    --primary: 163 45% 34%;             /* #2F7D6B assay green */
     --primary-foreground: 0 0% 100%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 35%;
-    --accent: 173 55% 92%;
-    --accent-foreground: 173 78% 18%;
-    --destructive: 0 72% 51%;
+    --secondary: 36 37% 93%;            /* #F4EFE7 page-warm */
+    --secondary-foreground: 145 8% 11%;
+    --muted: 36 37% 93%;
+    --muted-foreground: 145 4% 44%;     /* #6B7670 ink-3 */
+    --accent: 163 30% 92%;              /* #E4EFEB accent-tint */
+    --accent-foreground: 163 40% 24%;   /* #246153 accent-2 */
+    --destructive: 13 48% 47%;          /* #B8543A clay */
     --destructive-foreground: 0 0% 100%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 173 78% 26%;
-    --radius: 0.75rem;
-    --chart-1: 173 78% 26%;
-    --chart-2: 215 16% 35%;
-    --chart-3: 173 55% 42%;
-    --chart-4: 210 40% 75%;
-    --chart-5: 38 92% 50%;
+    --border: 145 8% 88%;
+    --input: 145 8% 88%;
+    --ring: 163 45% 34%;
+    --radius: 0.5rem;
+    --chart-1: 163 45% 34%;
+    --chart-2: 163 30% 65%;
+    --chart-3: 163 20% 78%;
+    --chart-4: 163 15% 87%;
+    --chart-5: 38 60% 60%;
+
+    /* PeptideDB design tokens */
+    --pdb-page:         #FAF7F2;
+    --pdb-page-warm:    #F4EFE7;
+    --pdb-page-cool:    #F2F4F1;
+    --pdb-ink:          #1A1F1C;
+    --pdb-ink-2:        #3A4540;
+    --pdb-ink-3:        #6B7670;
+    --pdb-ink-4:        #9DA6A1;
+    --pdb-line-1:       oklch(80% 0.008 145);
+    --pdb-line-2:       oklch(92% 0.005 145);
+    --pdb-line-3:       oklch(96% 0.003 145);
+    --pdb-accent:       #2F7D6B;
+    --pdb-accent-2:     #246153;
+    --pdb-accent-tint:  #E4EFEB;
+    --pdb-accent-tint-2:#CFE0DA;
+    --pdb-clay:         #B8543A;
+    --pdb-clay-tint:    #F4E2D9;
+    --pdb-citation:     #3C5A8A;
+    --pdb-citation-tint:#E2E8F2;
+    --pdb-font-display: 'Fraunces', 'Source Serif 4', Georgia, serif;
+    --pdb-font-body:    'Inter Tight', -apple-system, BlinkMacSystemFont, sans-serif;
+    --pdb-font-mono:    'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace;
+    --pdb-ease:         cubic-bezier(0.32, 0.72, 0, 1);
+    --pdb-shadow-1:     0 1px 0 oklch(20% 0.01 145 / 0.04), 0 2px 4px -1px oklch(20% 0.01 145 / 0.06);
+    --pdb-shadow-2:     0 1px 0 oklch(20% 0.01 145 / 0.05), 0 8px 16px -6px oklch(20% 0.01 145 / 0.10), 0 4px 8px -4px oklch(20% 0.01 145 / 0.08);
   }
 
   .dark {
-    --background: 222 47% 6%;
-    --foreground: 210 40% 96%;
-    --card: 222 47% 6%;
-    --card-foreground: 210 40% 96%;
-    --popover: 222 47% 9%;
-    --popover-foreground: 210 40% 96%;
-    --primary: 173 58% 39%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 222 30% 14%;
-    --secondary-foreground: 210 40% 90%;
-    --muted: 222 30% 14%;
-    --muted-foreground: 215 16% 57%;
-    --accent: 173 40% 14%;
-    --accent-foreground: 173 58% 70%;
-    --destructive: 0 62% 50%;
+    --background: 145 18% 7%;           /* #0E1411 */
+    --foreground: 145 4% 91%;           /* #E8EAE6 */
+    --card: 145 16% 9%;
+    --card-foreground: 145 4% 91%;
+    --popover: 145 16% 9%;
+    --popover-foreground: 145 4% 91%;
+    --primary: 163 35% 53%;             /* #5FB29E */
+    --primary-foreground: 145 18% 7%;
+    --secondary: 145 14% 12%;
+    --secondary-foreground: 145 4% 87%;
+    --muted: 145 14% 12%;
+    --muted-foreground: 145 4% 51%;
+    --accent: 163 20% 18%;
+    --accent-foreground: 163 35% 68%;
+    --destructive: 13 48% 47%;
     --destructive-foreground: 0 0% 100%;
-    --border: 222 20% 18%;
-    --input: 222 20% 18%;
-    --ring: 173 58% 39%;
-    --chart-1: 173 58% 39%;
-    --chart-2: 215 16% 57%;
-    --chart-3: 173 55% 50%;
-    --chart-4: 210 40% 40%;
-    --chart-5: 38 92% 50%;
+    --border: 145 10% 18%;
+    --input: 145 10% 18%;
+    --ring: 163 35% 53%;
+
+    --pdb-page:        #0E1411;
+    --pdb-page-warm:   #131A16;
+    --pdb-page-cool:   #0F1714;
+    --pdb-ink:         #E8EAE6;
+    --pdb-ink-2:       #B8BFB9;
+    --pdb-ink-3:       #818A84;
+    --pdb-ink-4:       #525A55;
+    --pdb-accent:      #5FB29E;
+    --pdb-accent-2:    #7AC5B3;
+    --pdb-accent-tint: oklch(28% 0.04 165);
+    --pdb-accent-tint-2: oklch(35% 0.06 165);
   }
 }
 
@@ -67,12 +101,58 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--pdb-font-body);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "ss01", "cv11", "tnum";
   }
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  h1, h2, h3 {
+    font-family: var(--pdb-font-display);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--pdb-ink);
   }
-  code, pre, .font-mono {
-    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+  h4, h5, h6 {
+    font-family: var(--pdb-font-body);
+    font-weight: 600;
+    color: var(--pdb-ink);
+  }
+  code, pre, kbd, samp, .font-mono {
+    font-family: var(--pdb-font-mono);
+  }
+  ::selection {
+    background: var(--pdb-accent-tint-2);
+    color: var(--pdb-ink);
+  }
+}
+
+/* PDB typography utility classes */
+@layer utilities {
+  .pdb-overline {
+    font-family: var(--pdb-font-body);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--pdb-ink-3);
+  }
+  .pdb-sequence {
+    font-family: var(--pdb-font-mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.02em;
+    word-break: break-all;
+    line-height: 1.5;
+  }
+  .pdb-mono {
+    font-family: var(--pdb-font-mono);
+    font-feature-settings: "ss01", "zero", "tnum";
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
