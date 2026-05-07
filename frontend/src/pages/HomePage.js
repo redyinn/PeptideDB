@@ -2,9 +2,12 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Search, ArrowRight, Dna, BookOpen, TestTube, ExternalLink, TrendingUp, FlaskConical } from 'lucide-react';
+import { Search, ArrowRight, Dna, ExternalLink } from 'lucide-react';
 import { Skeleton } from '../components/ui/skeleton';
-import { getPeptides, getTrials, getPapers, getStats, seedPeptides, getSeedStatus } from '../lib/api';
+import { getPeptides, getTrials, getStats, seedPeptides, getSeedStatus } from '../lib/api';
+import PeptideSequence from '../components/PeptideSequence';
+import ScrollScene from '../components/ScrollScene';
+import { useScrollReveal, useParallax } from '../hooks/useScrollReveal';
 
 /* ── shared inline styles ──────────────────────────────────────────────── */
 const ink  = 'var(--pdb-ink)';
@@ -36,8 +39,8 @@ function PeptideCard({ peptide, index, lang }) {
         className="card-hover pdb-card-in"
         style={{
           animationDelay: `${index * 60}ms`,
-          border: '1px solid oklch(92% 0.005 145)',
-          borderRadius: 8, padding: 22, background: '#fff',
+          border: '1px solid var(--pdb-line-2)',
+          borderRadius: 8, padding: 22, background: 'var(--pdb-card, #F7F3EA)',
           display: 'flex', flexDirection: 'column', gap: 10, height: '100%',
         }}
         data-testid={`peptide-card-${peptide.slug}`}
@@ -84,7 +87,7 @@ function TrialRow({ trial, index }) {
       style={{
         animationDelay: `${index * 50}ms`,
         display: 'flex', alignItems: 'flex-start', gap: 16, padding: '14px 16px',
-        borderRadius: 8, border: '1px solid oklch(92% 0.005 145)', background: '#fff',
+        borderRadius: 8, border: '1px solid var(--pdb-line-2)', background: 'var(--pdb-card, #F7F3EA)',
         textDecoration: 'none', transition: 'border-color 200ms var(--pdb-ease)',
       }}
       data-testid={`trial-item-${index}`}
@@ -113,6 +116,9 @@ export default function HomePage() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const lang = i18n.language;
+  const molRef = useRef(null);
+  useScrollReveal();
+  useParallax(molRef, 0.12);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
@@ -366,20 +372,11 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Right column — animated molecule */}
+          {/* Right column — animated peptide sequence */}
           <div className="pdb-fade" style={{ position: 'relative', justifySelf: 'end', animationDelay: '200ms', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div className="pdb-glow" style={{
-              position: 'absolute', inset: '-40px', borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(47,125,107,0.12), transparent 65%)',
-              pointerEvents: 'none',
-            }} />
-            <img
-              className="pdb-mol"
-              src="/molecule-animated.svg"
-              width="360" height="360"
-              alt=""
-              style={{ position: 'relative', zIndex: 1, display: 'block', maxWidth: '100%' }}
-            />
+            <div ref={molRef} className="pdb-mol" style={{ position: 'relative', willChange: 'transform' }}>
+              <PeptideSequence size={380} progress={1} />
+            </div>
           </div>
         </div>
 
@@ -388,7 +385,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Featured Peptides ─────────────────────────────────────────── */}
-      <section style={{ maxWidth: 1280, margin: '0 auto', padding: '64px 24px' }}>
+      <section data-reveal style={{ maxWidth: 1280, margin: '0 auto', padding: '64px 24px' }}>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 28, flexWrap: 'wrap', gap: 16 }}>
           <div>
             <h2 style={{ fontFamily: disp, fontSize: 28, fontWeight: 500, margin: 0, letterSpacing: '-0.015em', color: ink }}>
@@ -430,8 +427,11 @@ export default function HomePage() {
         )}
       </section>
 
+      {/* ── Scroll Scene ──────────────────────────────────────────────── */}
+      <ScrollScene />
+
       {/* ── Latest Trials ─────────────────────────────────────────────── */}
-      <section style={{ borderTop: '1px solid oklch(92% 0.005 145)', background: 'var(--pdb-page-warm)' }}>
+      <section data-reveal style={{ borderTop: '1px solid var(--pdb-line-2)', background: 'var(--pdb-page-warm)' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '56px 24px 64px' }}>
           <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 24, flexWrap: 'wrap', gap: 16 }}>
             <h2 style={{ fontFamily: disp, fontSize: 28, fontWeight: 500, margin: 0, letterSpacing: '-0.015em', color: ink }}>

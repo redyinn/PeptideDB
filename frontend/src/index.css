@@ -7,13 +7,13 @@
 @layer base {
   :root {
     /* shadcn HSL tokens — mapped to PeptideDB ivory palette */
-    --background: 38 44% 97%;           /* #FAF7F2 ivory */
+    --background: 40 33% 98%;           /* #FBFAF7 clean off-white */
     --foreground: 145 8% 11%;           /* #1A1F1C ink */
-    --card: 0 0% 100%;
+    --card: 38 44% 95%;                 /* #F7F3EA warm cream cards */
     --card-foreground: 145 8% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 145 8% 11%;
-    --primary: 163 45% 34%;             /* #2F7D6B assay green */
+    --primary: 160 27% 33%;             /* #3E6B5E teal-green */
     --primary-foreground: 0 0% 100%;
     --secondary: 36 37% 93%;            /* #F4EFE7 page-warm */
     --secondary-foreground: 145 8% 11%;
@@ -34,20 +34,21 @@
     --chart-5: 38 60% 60%;
 
     /* PeptideDB design tokens */
-    --pdb-page:         #FAF7F2;
-    --pdb-page-warm:    #F4EFE7;
+    --pdb-page:         #FBFAF7;
+    --pdb-page-warm:    #F7F3EA;
     --pdb-page-cool:    #F2F4F1;
-    --pdb-ink:          #1A1F1C;
+    --pdb-card:         #F7F3EA;
+    --pdb-ink:          #1B1A17;
     --pdb-ink-2:        #3A4540;
-    --pdb-ink-3:        #6B7670;
+    --pdb-ink-3:        #5C5547;
     --pdb-ink-4:        #9DA6A1;
     --pdb-line-1:       oklch(80% 0.008 145);
-    --pdb-line-2:       oklch(92% 0.005 145);
+    --pdb-line-2:       #E6E0D2;
     --pdb-line-3:       oklch(96% 0.003 145);
-    --pdb-accent:       #2F7D6B;
-    --pdb-accent-2:     #246153;
-    --pdb-accent-tint:  #E4EFEB;
-    --pdb-accent-tint-2:#CFE0DA;
+    --pdb-accent:       #3E6B5E;
+    --pdb-accent-2:     #2F5248;
+    --pdb-accent-tint:  #D6E8E3;
+    --pdb-accent-tint-2:#C4DDD6;
     --pdb-clay:         #B8543A;
     --pdb-clay-tint:    #F4E2D9;
     --pdb-citation:     #3C5A8A;
