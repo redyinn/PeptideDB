@@ -25,7 +25,7 @@ function getPhaseBadge(researchStatus) {
   const ph3 = { background: 'var(--pdb-accent-tint)', color: 'var(--pdb-accent)', border: '1px solid var(--pdb-accent-tint-2)' };
   const ph2 = { background: 'var(--pdb-citation-tint)', color: 'var(--pdb-citation)', border: '1px solid #C5D2E8' };
   const ph1 = { background: 'var(--pdb-clay-tint)', color: 'var(--pdb-clay)', border: '1px solid #E8C4B5' };
-  const other = { background: 'var(--pdb-page-warm)', color: 'var(--pdb-ink-3)', border: '1px solid oklch(92% 0.005 145)' };
+  const other = { background: 'var(--pdb-page-warm)', color: 'var(--pdb-ink-3)', border: '1px solid var(--pdb-line-2)' };
   if (fda_approved) return { label: 'FDA Approved', style: approved };
   if (ema_approved) return { label: 'EMA Approved', style: approved };
   if (ph.includes('phase 3') || ph.includes('phase iii') || ph.includes('phase 4') || ph.includes('phase iv'))

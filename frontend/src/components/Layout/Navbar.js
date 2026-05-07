@@ -127,10 +127,11 @@ export default function Navbar() {
             <button
               onClick={() => i18n.changeLanguage(i18n.language === 'en' ? 'de' : 'en')}
               data-testid="language-toggle"
-              style={{ ...iconBtn, gap: 4, width: 'auto', padding: '0 10px', fontSize: 13, fontWeight: 600 }}
+              title={i18n.language === 'en' ? 'Switch to Deutsch' : 'Zu Englisch wechseln'}
+              style={{ ...iconBtn, gap: 5, width: 'auto', padding: '0 10px', fontSize: 12, fontWeight: 700, letterSpacing: '0.04em' }}
             >
               <Globe style={{ width: 13, height: 13 }} />
-              {i18n.language === 'en' ? 'DE' : 'EN'}
+              {i18n.language.toUpperCase()}
             </button>
 
             {/* Mobile hamburger */}

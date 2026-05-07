@@ -31,7 +31,7 @@ function getEvidenceBadge(trial) {
   if (phase.includes('phase 2') || phase.includes('phase ii'))
     return { label: 'Level B', title: 'Phase 2', style: { background: 'var(--pdb-citation-tint)', color: 'var(--pdb-citation)', border: '1px solid #C5D2E8' } };
   if (phase.includes('phase 1') || phase.includes('phase i'))
-    return { label: 'Level C', title: 'Phase 1', style: { background: 'var(--pdb-page-warm)', color: 'var(--pdb-ink-3)', border: '1px solid oklch(92% 0.005 145)' } };
+    return { label: 'Level C', title: 'Phase 1', style: { background: 'var(--pdb-page-warm)', color: 'var(--pdb-ink-3)', border: '1px solid var(--pdb-line-2)' } };
   return null;
 }
 

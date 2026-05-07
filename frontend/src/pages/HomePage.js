@@ -59,7 +59,7 @@ function PeptideCard({ peptide, index, lang }) {
         <p style={{ fontFamily: body, fontSize: 14, lineHeight: 1.6, color: ink2, margin: 0, flex: 1 }}>
           {(peptide.description?.[lang] || peptide.description?.en || '').slice(0, 160)}…
         </p>
-        <div style={{ display: 'flex', gap: 16, fontFamily: mono, fontSize: 12, color: ink3, borderTop: '1px solid oklch(96% 0.003 145)', paddingTop: 10, marginTop: 'auto' }}>
+        <div style={{ display: 'flex', gap: 16, fontFamily: mono, fontSize: 12, color: ink3, borderTop: '1px solid var(--pdb-line-3)', paddingTop: 10, marginTop: 'auto' }}>
           {peptide.trials_count > 0 && <span><b style={{ color: ink, fontWeight: 500 }}>{peptide.trials_count}</b> trials</span>}
           {peptide.papers_count > 0 && <span><b style={{ color: ink, fontWeight: 500 }}>{peptide.papers_count}</b> papers</span>}
           {peptide.half_life && <span>t½&nbsp;<b style={{ color: ink, fontWeight: 500 }}>{peptide.half_life}</b></span>}
@@ -91,8 +91,8 @@ function TrialRow({ trial, index }) {
         textDecoration: 'none', transition: 'border-color 200ms var(--pdb-ease)',
       }}
       data-testid={`trial-item-${index}`}
-      onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'oklch(80% 0.008 145)'; }}
-      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'oklch(92% 0.005 145)'; }}
+      onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--pdb-line-1)'; }}
+      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--pdb-line-2)'; }}
     >
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{ fontFamily: body, fontSize: 14, fontWeight: 500, color: ink, margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -245,7 +245,7 @@ export default function HomePage() {
               <Link to="/encyclopedia" style={{
                 fontFamily: body, fontSize: 15, fontWeight: 500, textDecoration: 'none',
                 padding: '11px 22px', borderRadius: 8, border: 0,
-                background: acc, color: '#fff', display: 'inline-flex', alignItems: 'center', gap: 7,
+                background: acc, color: 'var(--pdb-page)', display: 'inline-flex', alignItems: 'center', gap: 7,
                 transition: 'background 200ms, transform 200ms',
               }}
                 onMouseEnter={(e) => { e.currentTarget.style.background = acc2; e.currentTarget.style.transform = 'translateY(-1px)'; }}
@@ -288,13 +288,13 @@ export default function HomePage() {
                     autoComplete="off"
                     style={{
                       width: '100%', paddingLeft: 36, paddingRight: 14, paddingTop: 9, paddingBottom: 9,
-                      fontFamily: body, fontSize: 14, border: '1px solid oklch(85% 0.008 145)',
-                      borderRadius: 6, background: '#fff', color: ink, outline: 'none',
+                      fontFamily: body, fontSize: 14, border: '1px solid var(--pdb-line-1)',
+                      borderRadius: 6, background: 'var(--pdb-card)', color: ink, outline: 'none',
                       boxSizing: 'border-box',
                       transition: 'border-color 120ms',
                     }}
                     onFocusCapture={(e) => { e.target.style.borderColor = acc; }}
-                    onBlurCapture={(e) => { e.target.style.borderColor = 'oklch(85% 0.008 145)'; }}
+                    onBlurCapture={(e) => { e.target.style.borderColor = 'var(--pdb-line-1)'; }}
                   />
                 </div>
                 <button
@@ -302,7 +302,7 @@ export default function HomePage() {
                   data-testid="hero-search-submit"
                   style={{
                     padding: '9px 16px', borderRadius: 6, border: 0, cursor: 'pointer',
-                    background: acc, color: '#fff', fontFamily: body, fontSize: 14, fontWeight: 500,
+                    background: acc, color: 'var(--pdb-page)', fontFamily: body, fontSize: 14, fontWeight: 500,
                     display: 'flex', alignItems: 'center', gap: 6,
                     transition: 'background 200ms',
                   }}
@@ -317,7 +317,7 @@ export default function HomePage() {
               {showSuggestions && suggestions.length > 0 && (
                 <div style={{
                   position: 'absolute', top: '100%', left: 0, right: 48, marginTop: 6,
-                  background: '#fff', border: '1px solid oklch(88% 0.006 145)',
+                  background: 'var(--pdb-card)', border: '1px solid var(--pdb-line-1)',
                   borderRadius: 8, boxShadow: 'var(--pdb-shadow-2)', zIndex: 50, overflow: 'hidden',
                 }}>
                   {suggestions.map((p) => (
@@ -343,8 +343,8 @@ export default function HomePage() {
                   <button
                     onMouseDown={handleSearch}
                     style={{
-                      width: '100%', padding: '9px 14px', borderTop: '1px solid oklch(95% 0.004 145)',
-                      background: 'transparent', border: 0, borderTop: '1px solid oklch(95% 0.004 145)',
+                      width: '100%', padding: '9px 14px', borderTop: '1px solid var(--pdb-line-3)',
+                      background: 'transparent', border: 0, borderTop: '1px solid var(--pdb-line-3)',
                       display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer',
                       fontFamily: mono, fontSize: 12, color: acc,
                     }}
@@ -362,7 +362,7 @@ export default function HomePage() {
               style={{
                 animationDelay: '400ms',
                 display: 'flex', gap: 28, marginTop: 44, paddingTop: 20,
-                borderTop: '1px solid oklch(92% 0.005 145)', flexWrap: 'wrap',
+                borderTop: '1px solid var(--pdb-line-2)', flexWrap: 'wrap',
               }}
             >
               <StatPill n={stats?.peptides_in_db || '48+'} label="Peptides" delay="480ms" />
@@ -403,7 +403,7 @@ export default function HomePage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 14 }}>
           {loading ? (
             Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} style={{ border: '1px solid oklch(92% 0.005 145)', borderRadius: 8, padding: 22, background: '#fff' }}>
+              <div key={i} style={{ border: '1px solid var(--pdb-line-2)', borderRadius: 8, padding: 22, background: 'var(--pdb-card)' }}>
                 <Skeleton className="h-5 w-32 mb-2" />
                 <Skeleton className="h-4 w-24 mb-4" />
                 <Skeleton className="h-16 w-full" />
@@ -445,7 +445,7 @@ export default function HomePage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {loading ? (
               Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} style={{ border: '1px solid oklch(92% 0.005 145)', borderRadius: 8, padding: '14px 16px', background: '#fff' }}>
+                <div key={i} style={{ border: '1px solid var(--pdb-line-2)', borderRadius: 8, padding: '14px 16px', background: 'var(--pdb-card)' }}>
                   <Skeleton className="h-4 w-full mb-2" />
                   <Skeleton className="h-3 w-48" />
                 </div>
