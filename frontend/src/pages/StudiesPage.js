@@ -18,6 +18,55 @@ const fadeUp = {
 };
 
 const SAVED_FILTERS_KEY = 'peptide-saved-study-filters';
+const TRANSLATION_CACHE_KEY = 'peptide-study-translations';
+
+const STATUS_DE = {
+  recruiting: 'Rekrutierend',
+  completed: 'Abgeschlossen',
+  active_not_recruiting: 'Aktiv (nicht rekrutierend)',
+  not_yet_recruiting: 'Noch nicht rekrutierend',
+  terminated: 'Beendet',
+  withdrawn: 'Zurückgezogen',
+  suspended: 'Ausgesetzt',
+  enrolling_by_invitation: 'Einladungsrekrutierung',
+  unknown: 'Unbekannt',
+};
+
+function getStatusLabel(status, lang) {
+  if (!status) return '';
+  if (lang !== 'de') return status.replace(/_/g, ' ');
+  const key = status.toLowerCase().replace(/\s+/g, '_');
+  return STATUS_DE[key] || status.replace(/_/g, ' ');
+}
+
+function loadTranslationCache() {
+  try { return JSON.parse(sessionStorage.getItem(TRANSLATION_CACHE_KEY) || '{}'); }
+  catch { return {}; }
+}
+
+async function translateBatch(texts) {
+  const cache = loadTranslationCache();
+  const results = {};
+  const toFetch = texts.filter(t => t && !cache[t]);
+
+  await Promise.all(toFetch.map(async (text) => {
+    try {
+      const q = text.length > 480 ? text.slice(0, 480) + '…' : text;
+      const res = await fetch(
+        `https://api.mymemory.translated.net/get?q=${encodeURIComponent(q)}&langpair=en|de`
+      );
+      const data = await res.json();
+      const translated = data?.responseData?.translatedText;
+      if (translated && translated !== text) {
+        results[text] = translated;
+        cache[text] = translated;
+      }
+    } catch { /* ignore, fallback to English */ }
+  }));
+
+  try { sessionStorage.setItem(TRANSLATION_CACHE_KEY, JSON.stringify(cache)); } catch {}
+  return { ...cache, ...results };
+}
 
 function loadSavedFilters() {
   try {
@@ -39,6 +88,8 @@ export default function StudiesPage() {
   const [company, setCompany] = useState(searchParams.get('company') || '');
   const [status, setStatus] = useState('');
   const [savedFilters, setSavedFilters] = useState(() => loadSavedFilters());
+  const [translations, setTranslations] = useState(() => loadTranslationCache());
+  const [translating, setTranslating] = useState(false);
 
   const loadTrials = useCallback(async () => {
     setLoading(true);
@@ -50,6 +101,19 @@ export default function StudiesPage() {
     }
     setLoading(false);
   }, [query, company, status]);
+
+  useEffect(() => {
+    if (lang !== 'de' || trials.length === 0) return;
+    const texts = trials.flatMap(t => [t.title, ...(t.conditions || [])]).filter(Boolean);
+    const cache = loadTranslationCache();
+    const needsFetch = texts.some(t => !cache[t]);
+    if (!needsFetch) { setTranslations(cache); return; }
+    setTranslating(true);
+    translateBatch(texts).then(map => {
+      setTranslations(map);
+      setTranslating(false);
+    });
+  }, [trials, lang]);
 
   useEffect(() => { loadTrials(); }, [loadTrials]);
 
@@ -107,6 +171,12 @@ export default function StudiesPage() {
         <p className="mt-2 text-base text-muted-foreground max-w-[64ch]">
           {t('studies.subtitle')}
         </p>
+        {translating && (
+          <p className="mt-1 text-xs text-muted-foreground flex items-center gap-1">
+            <span className="inline-block w-2 h-2 rounded-full bg-primary animate-pulse" />
+            {lang === 'de' ? 'Studien werden übersetzt…' : 'Translating…'}
+          </p>
+        )}
       </motion.div>
 
       {/* Saved Filters */}
@@ -224,12 +294,12 @@ export default function StudiesPage() {
                     <div className="flex-1 min-w-0">
                       <a href={trial.url} target="_blank" rel="noopener noreferrer" className="block">
                         <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors leading-relaxed">
-                          {trial.title}
+                          {(lang === 'de' && translations[trial.title]) || trial.title}
                         </p>
                       </a>
                       <div className="mt-2 flex flex-wrap items-center gap-2">
                         <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${getStatusClass(trial.status)}`}>
-                          {trial.status?.replace(/_/g, ' ')}
+                          {getStatusLabel(trial.status, lang)}
                         </span>
                         {trial.phase !== 'N/A' && <Badge variant="outline" className="text-xs">{trial.phase}</Badge>}
                         <span className="text-xs font-medium text-muted-foreground">{trial.sponsor}</span>
@@ -237,7 +307,9 @@ export default function StudiesPage() {
                       {trial.conditions && trial.conditions.length > 0 && (
                         <div className="mt-2 flex flex-wrap gap-1">
                           {trial.conditions.slice(0, 4).map((c, ci) => (
-                            <Badge key={ci} variant="secondary" className="text-xs">{c}</Badge>
+                            <Badge key={ci} variant="secondary" className="text-xs">
+                              {(lang === 'de' && translations[c]) || c}
+                            </Badge>
                           ))}
                           {trial.conditions.length > 4 && (
                             <Badge variant="secondary" className="text-xs">+{trial.conditions.length - 4}</Badge>
