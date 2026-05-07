@@ -463,6 +463,12 @@ async def get_peptides(
         if category:
             c = category.lower()
             results = [p for p in results if c in p.get("category","").lower()]
+        if goal:
+            g = goal.lower()
+            results = [p for p in results if any(
+                g in ag.get("goal_en", "").lower() or g in ag.get("goal_de", "").lower()
+                for ag in p.get("application_goals", [])
+            )]
         results = sorted(results, key=lambda x: x.get("name",""))
         total = len(results)
         skip = (page - 1) * limit
@@ -480,7 +486,14 @@ async def get_peptides(
     if category:
         filter_q["category"] = {"$regex": category, "$options": "i"}
     if goal:
-        filter_q["application_goals.goal_en"] = {"$regex": goal, "$options": "i"}
+        goal_condition = {"$or": [
+            {"application_goals.goal_en": {"$regex": goal, "$options": "i"}},
+            {"application_goals.goal_de": {"$regex": goal, "$options": "i"}},
+        ]}
+        if "$or" in filter_q:
+            filter_q = {"$and": [filter_q, goal_condition]}
+        else:
+            filter_q.update(goal_condition)
     skip = (page - 1) * limit
     total = peptides_col.count_documents(filter_q)
     docs = list(peptides_col.find(filter_q).sort("name", 1).skip(skip).limit(limit))
