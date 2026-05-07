@@ -38,18 +38,18 @@ export default function PeptideSequence({ size = 380, progress = 1, flyIn = fals
     >
       <defs>
         <radialGradient id="pdb-seq-glow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="rgba(62,107,94,0.18)" />
-          <stop offset="70%" stopColor="rgba(62,107,94,0)" />
+          <stop offset="0%" stopColor="rgba(26,26,26,0.08)" />
+          <stop offset="70%" stopColor="rgba(26,26,26,0)" />
         </radialGradient>
       </defs>
 
       <circle cx="50" cy="50" r="48" fill="url(#pdb-seq-glow)" />
-      <circle cx="48" cy="50" r="34" fill="none" stroke="var(--pdb-line-2, #E6E0D2)" strokeWidth="0.3" strokeDasharray="0.6 1.4" />
+      <circle cx="48" cy="50" r="34" fill="none" stroke="var(--pdb-line-2, #E5E5E2)" strokeWidth="0.3" strokeDasharray="0.6 1.4" />
 
       <path
         d={pathD}
         fill="none"
-        stroke="var(--pdb-accent, #3E6B5E)"
+        stroke="var(--pdb-accent, #1A1A1A)"
         strokeWidth="0.6"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -80,8 +80,8 @@ export default function PeptideSequence({ size = 380, progress = 1, flyIn = fals
           <g key={i} transform={`translate(${tx} ${ty}) scale(${scale})`} style={{ opacity }}>
             <circle
               r="4"
-              fill={isAccent ? 'var(--pdb-accent, #3E6B5E)' : 'var(--pdb-card, #F7F3EA)'}
-              stroke="var(--pdb-accent, #3E6B5E)"
+              fill={isAccent ? 'var(--pdb-accent, #1A1A1A)' : 'var(--pdb-card, #FFFFFF)'}
+              stroke="var(--pdb-accent, #1A1A1A)"
               strokeWidth="0.5"
             />
             <text
@@ -90,7 +90,7 @@ export default function PeptideSequence({ size = 380, progress = 1, flyIn = fals
               fontFamily="var(--pdb-font-mono, ui-monospace)"
               fontSize="3.4"
               fontWeight="600"
-              fill={isAccent ? 'var(--pdb-card, #F7F3EA)' : 'var(--pdb-ink, #1B1A17)'}
+              fill={isAccent ? 'var(--pdb-card, #F7F3EA)' : 'var(--pdb-ink, #0F0F0F)'}
               style={{ userSelect: 'none' }}
             >
               {r.l}
@@ -103,10 +103,10 @@ export default function PeptideSequence({ size = 380, progress = 1, flyIn = fals
         <g transform="translate(22 50)" style={{ opacity: (progress - 0.95) / 0.05 }}>
           <text textAnchor="middle" dominantBaseline="central"
             fontFamily="var(--pdb-font-mono, ui-monospace)" fontSize="2.6"
-            fill="var(--pdb-ink-3, #5C5547)" x="-12">N′</text>
+            fill="var(--pdb-ink-3, #6B6B6B)" x="-12">N′</text>
           <text textAnchor="middle" dominantBaseline="central"
             fontFamily="var(--pdb-font-mono, ui-monospace)" fontSize="2.6"
-            fill="var(--pdb-ink-3, #5C5547)" x="60" y="0">C′</text>
+            fill="var(--pdb-ink-3, #6B6B6B)" x="60" y="0">C′</text>
         </g>
       )}
     </svg>

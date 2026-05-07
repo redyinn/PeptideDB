@@ -6,53 +6,53 @@
 
 @layer base {
   :root {
-    /* shadcn HSL tokens — mapped to PeptideDB ivory palette */
-    --background: 40 33% 98%;           /* #FBFAF7 clean off-white */
-    --foreground: 145 8% 11%;           /* #1A1F1C ink */
-    --card: 38 44% 95%;                 /* #F7F3EA warm cream cards */
-    --card-foreground: 145 8% 11%;
+    /* shadcn HSL tokens — mapped to PeptideDB neutral palette */
+    --background: 60 4% 96%;            /* #F4F4F2 neutral paper */
+    --foreground: 0 0% 6%;              /* #0F0F0F ink */
+    --card: 0 0% 100%;                  /* #FFFFFF pure white */
+    --card-foreground: 0 0% 6%;
     --popover: 0 0% 100%;
-    --popover-foreground: 145 8% 11%;
-    --primary: 160 27% 33%;             /* #3E6B5E teal-green */
+    --popover-foreground: 0 0% 6%;
+    --primary: 0 0% 10%;                /* #1A1A1A near-black */
     --primary-foreground: 0 0% 100%;
-    --secondary: 36 37% 93%;            /* #F4EFE7 page-warm */
-    --secondary-foreground: 145 8% 11%;
-    --muted: 36 37% 93%;
-    --muted-foreground: 145 4% 44%;     /* #6B7670 ink-3 */
-    --accent: 163 30% 92%;              /* #E4EFEB accent-tint */
-    --accent-foreground: 163 40% 24%;   /* #246153 accent-2 */
-    --destructive: 13 48% 47%;          /* #B8543A clay */
+    --secondary: 60 3% 93%;             /* #EDEDEB page-warm */
+    --secondary-foreground: 0 0% 6%;
+    --muted: 60 3% 93%;
+    --muted-foreground: 0 0% 42%;       /* #6B6B6B ink-3 */
+    --accent: 0 0% 93%;                 /* #EDEDED accent-tint */
+    --accent-foreground: 0 0% 0%;       /* #000000 accent-2 */
+    --destructive: 5 64% 32%;           /* #8A2A1F clay */
     --destructive-foreground: 0 0% 100%;
-    --border: 145 8% 88%;
-    --input: 145 8% 88%;
-    --ring: 163 45% 34%;
+    --border: 60 3% 83%;                /* #D4D4D2 line-1 */
+    --input: 60 3% 83%;
+    --ring: 0 0% 10%;
     --radius: 0.5rem;
-    --chart-1: 163 45% 34%;
-    --chart-2: 163 30% 65%;
-    --chart-3: 163 20% 78%;
-    --chart-4: 163 15% 87%;
-    --chart-5: 38 60% 60%;
+    --chart-1: 0 0% 10%;
+    --chart-2: 0 0% 36%;
+    --chart-3: 0 0% 60%;
+    --chart-4: 0 0% 83%;
+    --chart-5: 0 0% 93%;
 
     /* PeptideDB design tokens */
-    --pdb-page:         #FBFAF7;
-    --pdb-page-warm:    #F7F3EA;
-    --pdb-page-cool:    #F2F4F1;
-    --pdb-card:         #F7F3EA;
-    --pdb-ink:          #1B1A17;
-    --pdb-ink-2:        #3A4540;
-    --pdb-ink-3:        #5C5547;
-    --pdb-ink-4:        #9DA6A1;
-    --pdb-line-1:       oklch(80% 0.008 145);
-    --pdb-line-2:       #E6E0D2;
-    --pdb-line-3:       oklch(96% 0.003 145);
-    --pdb-accent:       #3E6B5E;
-    --pdb-accent-2:     #2F5248;
-    --pdb-accent-tint:  #D6E8E3;
-    --pdb-accent-tint-2:#C4DDD6;
-    --pdb-clay:         #B8543A;
-    --pdb-clay-tint:    #F4E2D9;
-    --pdb-citation:     #3C5A8A;
-    --pdb-citation-tint:#E2E8F2;
+    --pdb-page:         #F4F4F2;
+    --pdb-page-warm:    #EDEDEB;
+    --pdb-page-cool:    #F0F1F0;
+    --pdb-card:         #FFFFFF;
+    --pdb-ink:          #0F0F0F;
+    --pdb-ink-2:        #2E2E2E;
+    --pdb-ink-3:        #6B6B6B;
+    --pdb-ink-4:        #A8A8A8;
+    --pdb-line-1:       #D4D4D2;
+    --pdb-line-2:       #E5E5E2;
+    --pdb-line-3:       #EFEFEC;
+    --pdb-accent:       #1A1A1A;
+    --pdb-accent-2:     #000000;
+    --pdb-accent-tint:  #EDEDED;
+    --pdb-accent-tint-2:#DCDCDC;
+    --pdb-clay:         #8A2A1F;
+    --pdb-clay-tint:    #F0E2DF;
+    --pdb-citation:     #1F1F1F;
+    --pdb-citation-tint:#E8E8E8;
     --pdb-font-display: 'Fraunces', 'Source Serif 4', Georgia, serif;
     --pdb-font-body:    'Inter Tight', -apple-system, BlinkMacSystemFont, sans-serif;
     --pdb-font-mono:    'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace;
@@ -62,37 +62,41 @@
   }
 
   .dark {
-    --background: 145 18% 7%;           /* #0E1411 */
-    --foreground: 145 4% 91%;           /* #E8EAE6 */
-    --card: 145 16% 9%;
-    --card-foreground: 145 4% 91%;
-    --popover: 145 16% 9%;
-    --popover-foreground: 145 4% 91%;
-    --primary: 163 35% 53%;             /* #5FB29E */
-    --primary-foreground: 145 18% 7%;
-    --secondary: 145 14% 12%;
-    --secondary-foreground: 145 4% 87%;
-    --muted: 145 14% 12%;
-    --muted-foreground: 145 4% 51%;
-    --accent: 163 20% 18%;
-    --accent-foreground: 163 35% 68%;
-    --destructive: 13 48% 47%;
+    --background: 0 0% 5%;              /* #0E0E0E */
+    --foreground: 0 0% 95%;             /* #F2F2F2 */
+    --card: 0 0% 10%;                   /* #1A1A1A */
+    --card-foreground: 0 0% 95%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 0 0% 95%;                /* #F2F2F2 */
+    --primary-foreground: 0 0% 5%;
+    --secondary: 0 0% 8%;
+    --secondary-foreground: 0 0% 87%;
+    --muted: 0 0% 8%;
+    --muted-foreground: 0 0% 51%;
+    --accent: 0 0% 12%;                 /* #1F1F1F */
+    --accent-foreground: 0 0% 95%;
+    --destructive: 5 64% 32%;
     --destructive-foreground: 0 0% 100%;
-    --border: 145 10% 18%;
-    --input: 145 10% 18%;
-    --ring: 163 35% 53%;
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 0 0% 95%;
 
-    --pdb-page:        #0E1411;
-    --pdb-page-warm:   #131A16;
-    --pdb-page-cool:   #0F1714;
-    --pdb-ink:         #E8EAE6;
-    --pdb-ink-2:       #B8BFB9;
-    --pdb-ink-3:       #818A84;
-    --pdb-ink-4:       #525A55;
-    --pdb-accent:      #5FB29E;
-    --pdb-accent-2:    #7AC5B3;
-    --pdb-accent-tint: oklch(28% 0.04 165);
-    --pdb-accent-tint-2: oklch(35% 0.06 165);
+    --pdb-page:        #0E0E0E;
+    --pdb-page-warm:   #141414;
+    --pdb-page-cool:   #111111;
+    --pdb-card:        #1A1A1A;
+    --pdb-ink:         #F2F2F2;
+    --pdb-ink-2:       #BCBCBC;
+    --pdb-ink-3:       #828282;
+    --pdb-ink-4:       #555555;
+    --pdb-line-1:      #2E2E2E;
+    --pdb-line-2:      #242424;
+    --pdb-line-3:      #1C1C1C;
+    --pdb-accent:      #F2F2F2;
+    --pdb-accent-2:    #FFFFFF;
+    --pdb-accent-tint: #1F1F1F;
+    --pdb-accent-tint-2: #2A2A2A;
   }
 }
 

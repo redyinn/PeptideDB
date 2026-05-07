@@ -49,7 +49,7 @@ export default function Navbar() {
   const iconBtn = {
     display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
     width: 32, height: 32, borderRadius: 6, cursor: 'pointer',
-    border: '1px solid oklch(88% 0.006 145)',
+    border: '1px solid var(--pdb-line-1)',
     background: 'transparent', color: 'var(--pdb-ink)',
     transition: 'background 120ms, border-color 120ms',
   };
@@ -78,7 +78,7 @@ export default function Navbar() {
                   padding: '6px 12px', borderRadius: 6, fontSize: 14, fontWeight: 500,
                   fontFamily: 'var(--pdb-font-body)', textDecoration: 'none',
                   color: isActive(item.path) ? 'var(--pdb-ink)' : 'var(--pdb-ink-3)',
-                  background: isActive(item.path) ? 'oklch(92% 0.005 145 / 0.6)' : 'transparent',
+                  background: isActive(item.path) ? 'rgba(26, 26, 26, 0.06)' : 'transparent',
                   transition: 'color 120ms, background 120ms',
                 }}
               >
@@ -95,17 +95,17 @@ export default function Navbar() {
             className="hidden md:flex"
             style={{
               alignItems: 'center', gap: 8,
-              padding: '7px 12px', border: '1px solid oklch(80% 0.008 145)', borderRadius: 6,
-              background: '#fff', color: 'var(--pdb-ink-3)', fontSize: 13,
+              padding: '7px 12px', border: '1px solid var(--pdb-line-1)', borderRadius: 6,
+              background: 'var(--pdb-card)', color: 'var(--pdb-ink-3)', fontSize: 13,
               fontFamily: 'var(--pdb-font-body)', cursor: 'pointer', minWidth: 200,
               transition: 'border-color 120ms',
             }}
             onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--pdb-accent)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'oklch(80% 0.008 145)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--pdb-line-1)'; }}
           >
             <Search style={{ width: 13, height: 13, flexShrink: 0 }} />
             <span style={{ flex: 1, textAlign: 'left' }}>Search peptides…</span>
-            <span style={{ fontFamily: 'var(--pdb-font-mono)', fontSize: 11, padding: '1px 5px', border: '1px solid oklch(92% 0.005 145)', borderRadius: 3, color: 'var(--pdb-ink-4)' }}>⌘K</span>
+            <span style={{ fontFamily: 'var(--pdb-font-mono)', fontSize: 11, padding: '1px 5px', border: '1px solid var(--pdb-line-2)', borderRadius: 3, color: 'var(--pdb-ink-4)' }}>⌘K</span>
           </button>
 
           {/* Actions */}
@@ -155,7 +155,7 @@ export default function Navbar() {
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.18 }}
             className="md:hidden"
-            style={{ background: 'var(--pdb-page)', borderBottom: '1px solid oklch(92% 0.005 145)' }}
+            style={{ background: 'var(--pdb-page)', borderBottom: '1px solid var(--pdb-line-3)' }}
           >
             <div style={{ maxWidth: 1280, margin: '0 auto', padding: '10px 24px 14px', display: 'flex', flexDirection: 'column', gap: 2 }}>
               <Link to="/" onClick={() => setMobileOpen(false)} style={{ padding: '8px 12px', borderRadius: 6, fontSize: 14, fontWeight: 500, color: isActive('/') ? 'var(--pdb-accent)' : 'var(--pdb-ink-2)', textDecoration: 'none' }}>{t('nav.home')}</Link>
